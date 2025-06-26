@@ -1,1 +1,5 @@
-export class CreateCityDto {}
+export class CreateCityDto {
+  name: string;
+  description: string;
+  active: boolean;
+}
