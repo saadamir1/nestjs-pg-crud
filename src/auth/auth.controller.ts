@@ -1,6 +1,8 @@
-import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Body, UnauthorizedException, Get, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
+import { CurrentUser } from './decorators/current-user.decorator';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -26,5 +28,11 @@ export class AuthController {
   @Post('login')
   async login(@Body() body: { email: string; password: string }) {
     return this.authService.login(body.email, body.password);
+  }
+  
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  getMe(@CurrentUser() user: any) {
+    return user;
   }
 }
