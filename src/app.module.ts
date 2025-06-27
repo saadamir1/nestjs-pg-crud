@@ -5,10 +5,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { CitiesModule } from './cities/cities.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }), // Load environment variables globally
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -28,6 +29,7 @@ import { CitiesModule } from './cities/cities.module';
       },
     }),
     CitiesModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
