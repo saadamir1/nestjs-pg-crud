@@ -29,4 +29,7 @@ export class User {
     default: '',
   })
   lastName: string;
+
+  @Column({ default: 'user' })
+  role: 'user' | 'admin';
 }
