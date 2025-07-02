@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
+// JWT strategy to validate and attach user info from token to request
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
