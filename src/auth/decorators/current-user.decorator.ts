@@ -1,7 +1,7 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
 /**
- * Extracts the authenticated user from the request.
+ * Custom decorator that extracts the authenticated user from the request.
  * Use inside controllers to access `req.user` set by the JWT strategy.
  */
 export const CurrentUser = createParamDecorator(
