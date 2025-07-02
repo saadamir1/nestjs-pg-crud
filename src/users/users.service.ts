@@ -13,26 +13,6 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async register(createUserDto: CreateUserDto) {
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-    const user = this.userRepository.create({
-      ...createUserDto,
-      password: hashedPassword,
-    });
-    return this.userRepository.save(user);
-  }
-
-  async login(email: string, plainPassword: string) {
-    const user = await this.userRepository.findOne({ where: { email } });
-    if (!user) throw new UnauthorizedException('Invalid credentials');
-
-    const passwordMatch = await bcrypt.compare(plainPassword, user.password);
-    if (!passwordMatch) throw new UnauthorizedException('Invalid credentials');
-
-    // In a real app, return JWT here
-    return { message: 'Login successful', userId: user.id };
-  }
-
   findAll() {
     return this.userRepository.find();
   }
