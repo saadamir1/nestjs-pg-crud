@@ -57,15 +57,14 @@ export class UsersService {
   }
 
   async findByEmail(email: string): Promise<User | null> {
-  return this.userRepository.findOne({ where: { email } });
-}
-async create(createUserDto: CreateUserDto) {
-  const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-  const user = this.userRepository.create({
-    ...createUserDto,
-    password: hashedPassword,
-  });
-  return this.userRepository.save(user);
-}
-
+    return this.userRepository.findOne({ where: { email } });
+  }
+  async create(createUserDto: CreateUserDto) {
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+    const user = this.userRepository.create({
+      ...createUserDto,
+      password: hashedPassword,
+    });
+    return this.userRepository.save(user);
+  }
 }

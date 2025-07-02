@@ -1,4 +1,11 @@
-import { Controller, Post, Body, UnauthorizedException, Get, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UnauthorizedException,
+  Get,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { CurrentUser } from './decorators/current-user.decorator';
@@ -12,7 +19,15 @@ export class AuthController {
   ) {}
 
   @Post('register')
-  async register(@Body() body: { firstName: string; lastName: string; email: string; password: string }) {
+  async register(
+    @Body()
+    body: {
+      firstName: string;
+      lastName: string;
+      email: string;
+      password: string;
+    },
+  ) {
     const userExists = await this.usersService.findByEmail(body.email);
     if (userExists) {
       throw new UnauthorizedException('Email already in use');
@@ -27,9 +42,11 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() body: { email: string; password: string }) {
-    return this.authService.login(body.email, body.password);
+    const token = await this.authService.login(body.email, body.password);
+    console.log('Token from auth login:', token);
+    return token;
   }
-  
+
   @Get('me')
   @UseGuards(JwtAuthGuard)
   getMe(@CurrentUser() user: any) {
