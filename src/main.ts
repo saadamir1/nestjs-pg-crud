@@ -12,7 +12,7 @@ async function bootstrap() {
       transform: true, // auto-transforms payloads to DTO classes
     }),
   );
-  app.useGlobalFilters(new AllExceptionsFilter());
+  app.useGlobalFilters(new AllExceptionsFilter()); // handles unhandled exceptions globally
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
