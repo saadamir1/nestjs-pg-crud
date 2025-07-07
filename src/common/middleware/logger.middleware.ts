@@ -16,7 +16,10 @@ export class LoggerMiddleware implements NestMiddleware {
       const duration = Date.now() - start; // Calculate total request duration (in ms)
 
       // Log the structured message using winston (goes to console + file)
-      logger.info(`${method} ${originalUrl} ${status} - ${duration}ms`);
+      // Only log if no exception was thrown (status < 400)
+      if (res.statusCode < 400) {
+        logger.info(`${method} ${originalUrl} ${status} - ${duration}ms`);
+      }
     });
 
     // Call the next middleware or controller
