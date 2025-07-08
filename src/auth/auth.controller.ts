@@ -12,6 +12,8 @@ import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { RolesGuard } from 'src/common/guards/roles.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -21,6 +23,8 @@ export class AuthController {
   ) {}
 
   @Post('register')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   async register(
     @Body()
     body: {
