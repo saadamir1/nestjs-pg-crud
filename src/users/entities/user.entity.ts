@@ -32,4 +32,7 @@ export class User {
 
   @Column({ default: 'user' })
   role: 'user' | 'admin';
+
+  @Column({ type: 'text', nullable: true })
+  refreshToken: string;
 }
