@@ -84,7 +84,7 @@ API available at `http://localhost:3000`
 | ------ | ---------------- | -------------------------- |
 | `GET`  | `/users`         | Get all users (admin only) |
 | `GET`  | `/users/profile` | Get user profile           |
-| `POST` | `/users`         | Create user (admin only)   |
+| `POST` | `/users/register`         | Create user (admin only)   |
 
 ### 🌍 Cities (Protected)
 
