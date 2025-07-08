@@ -26,7 +26,10 @@ export class AuthService {
   async generateTokens(user: any) {
     const payload = { email: user.email, sub: user.id, role: user.role };
     const access_token = this.jwtService.sign(payload, { expiresIn: '15m' });
-    const refresh_token = this.jwtService.sign(payload, { expiresIn: '7d' });
+    const refresh_token = this.jwtService.sign(payload, {
+      secret: 'refresh-secret',
+      expiresIn: '7d',
+    });
     return { access_token, refresh_token };
   }
 
@@ -48,20 +51,31 @@ export class AuthService {
     return tokens;
   }
 
-  async refresh(userId: number, incomingRefreshToken: string) {
-    const user = await this.usersService.findOne(userId);
-    if (!user?.refreshToken)
-      throw new ForbiddenException('No refresh token stored');
+  async refresh(incomingRefreshToken: string) {
+    try {
+      const payload = this.jwtService.verify(incomingRefreshToken, {
+        secret: 'refresh-secret', // same secret used for refresh token generation
+      });
 
-    const isMatch = await bcrypt.compare(
-      incomingRefreshToken,
-      user.refreshToken,
-    );
-    if (!isMatch) throw new ForbiddenException('Invalid refresh token');
+      const user = await this.usersService.findOne(payload.sub);
+      if (!user?.refreshToken) {
+        throw new ForbiddenException('No refresh token stored');
+      }
 
-    const tokens = await this.generateTokens(user);
-    await this.updateRefreshToken(user.id, tokens.refresh_token);
+      const isMatch = await bcrypt.compare(
+        incomingRefreshToken,
+        user.refreshToken,
+      );
+      if (!isMatch) {
+        throw new ForbiddenException('Invalid refresh token');
+      }
 
-    return tokens;
+      const tokens = await this.generateTokens(user);
+      await this.updateRefreshToken(user.id, tokens.refresh_token);
+
+      return tokens;
+    } catch (err) {
+      throw new ForbiddenException('Invalid or expired refresh token');
+    }
   }
 }
