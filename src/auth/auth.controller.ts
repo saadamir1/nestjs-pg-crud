@@ -49,11 +49,11 @@ export class AuthController {
   }
 
   @Post('refresh')
-  async refresh(@Body() body: { userId: number; refreshToken: string }) {
-    if (!body.userId || !body.refreshToken) {
-      throw new ForbiddenException('Missing credentials');
+  async refresh(@Body() body: { refreshToken: string }) {
+    if (!body.refreshToken) {
+      throw new ForbiddenException('Missing refresh token');
     }
-    return this.authService.refresh(body.userId, body.refreshToken);
+    return this.authService.refresh(body.refreshToken);
   }
 
   @Get('me')
