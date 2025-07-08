@@ -1,32 +1,29 @@
 # NestJS PostgreSQL CRUD API with Auth & RBAC
 
-A full-featured REST API built with NestJS, PostgreSQL, and TypeORM. This project includes user registration, login, JWT authentication, and role-based access control, in addition to basic CRUD operations on cities.
+A full-featured REST API built with NestJS, PostgreSQL, and TypeORM with JWT authentication, refresh tokens, role-based access control, and CRUD operations.
 
 ## 🛠️ Tech Stack
 
 - **NestJS** - Progressive Node.js framework
-- **TypeORM** - Object-Relational Mapping
-- **PostgreSQL** - Relational Database
-- **TypeScript** - Type-safe JavaScript
-- **Passport.js** - Middleware for authentication strategies (used with JWT)
-- **JWT** - Token-based authentication
+- **TypeORM** - ORM for TypeScript
+- **PostgreSQL** - Relational database
+- **JWT** - Access and refresh token authentication
 - **bcrypt** - Password hashing
+- **TypeScript** - Type safety
 
 ## ✨ Features
 
-- 🔐 **JWT Authentication** - Secure token-based auth
-- 🛡️ **Role-Based Access Control** - Admin/User permissions
-- 🔒 **Password Security** - bcrypt hashing
-- 🚀 **RESTful API** - Standard HTTP methods
+- 🔐 **JWT Authentication** (Access + Refresh Tokens)
+- 🔄 **Token Refresh Mechanism**
+- 🛡️ **Role-Based Access Control** (Admin/User)
+- 🔒 **Hashed Passwords with bcrypt**
+- 📋 **Pagination Support** (e.g., `/cities?page=2`)
+- 🧹 **Soft Delete Support** (e.g., cities)
+- 🧾 **Request Logging Middleware**
+- 🚀 **RESTful API Structure**
 - 📊 **Database Integration** - PostgreSQL with TypeORM
 - 🎯 **Type Safety** - Full TypeScript support
 - 🧪 **Easy Testing** - Ready for Postman/curl
-
-## 📋 Prerequisites
-
-- **Node.js** (v16 or higher)
-- **PostgreSQL** (v12 or higher)
-- **npm** or **yarn**
 
 ## 🚀 Quick Start
 
@@ -40,8 +37,6 @@ npm install
 
 ### 2. Database Setup
 
-Make sure PostgreSQL is running. Then:
-
 ```sql
 CREATE USER dev WITH PASSWORD 'secret';
 CREATE DATABASE demo OWNER dev;
@@ -50,7 +45,7 @@ GRANT ALL PRIVILEGES ON DATABASE demo TO dev;
 
 ### 3. Environment Variables
 
-Create a `.env` file at the root:
+Create `.env`:
 
 ```env
 DB_HOST=127.0.0.1
@@ -59,7 +54,9 @@ DB_USERNAME=dev
 DB_PASSWORD=secret
 DB_NAME=demo
 JWT_SECRET=jwt-secret-key
-JWT_EXPIRES_IN=3600s
+JWT_EXPIRES_IN=900s
+JWT_REFRESH_SECRET=jwt-refresh-secret
+JWT_REFRESH_EXPIRES_IN=7d
 ```
 
 ### 4. Run Application
@@ -68,124 +65,116 @@ JWT_EXPIRES_IN=3600s
 npm run start:dev
 ```
 
-The API will be available at `http://localhost:3000`
+API available at `http://localhost:3000`
 
 ## 🧪 API Endpoints
 
 ### 🔐 Auth
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/auth/register` | Register user |
-| `POST` | `/auth/login` | Login user and receive JWT |
-| `GET` | `/auth/me` | Get current logged-in user (JWT required) |
+| Method | Endpoint         | Description          |
+| ------ | ---------------- | -------------------- |
+| `POST` | `/auth/register` | Register user        |
+| `POST` | `/auth/login`    | Login and get tokens |
+| `POST` | `/auth/refresh`  | Refresh access token |
+| `GET`  | `/auth/me`       | Get current user     |
 
 ### 👤 Users (Protected)
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/users` | Get all users (admin only) |
-| `GET` | `/users/profile` | Get user profile (JWT required) |
+| Method | Endpoint         | Description                |
+| ------ | ---------------- | -------------------------- |
+| `GET`  | `/users`         | Get all users (admin only) |
+| `GET`  | `/users/profile` | Get user profile           |
+| `POST` | `/users`         | Create user (admin only)   |
 
 ### 🌍 Cities (Protected)
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/cities` | Create a city |
-| `GET` | `/cities` | Get all cities |
-| `GET` | `/cities/:id` | Get city by ID |
-| `PATCH` | `/cities/:id` | Update city |
-| `DELETE` | `/cities/:id` | Delete city |
+| Method   | Endpoint         | Description          |
+| -------- | ---------------- | -------------------- |
+| `POST`   | `/cities`        | Create city          |
+| `GET`    | `/cities?page=1` | Get paginated cities |
+| `GET`    | `/cities/:id`    | Get city by ID       |
+| `PATCH`  | `/cities/:id`    | Update city          |
+| `DELETE` | `/cities/:id`    | Soft delete city     |
 
-## 🧪 Testing the API
+## 🔁 Token Flow
 
-### Register a User
+- **Access Token** expires in 15 mins
+- **Refresh Token** stored securely in DB (7 days)
+- Use `/auth/refresh` to get new tokens without re-login
+
+## 🧪 Testing Examples
+
+### Register & Login
+
 ```bash
+# Register
 curl -X POST http://localhost:3000/auth/register \
   -H "Content-Type: application/json" \
-  -d '{
-    "email": "admin@example.com",
-    "password": "securePassword123",
-    "firstName": "John",
-    "lastName": "Doe",
-    "role": "admin"
-  }'
-```
+  -d '{"email": "admin@example.com", "password": "securePassword123", "firstName": "John", "lastName": "Doe", "role": "admin"}'
 
-### Login & Get Token
-```bash
+# Login
 curl -X POST http://localhost:3000/auth/login \
   -H "Content-Type: application/json" \
-  -d '{
-    "email": "admin@example.com",
-    "password": "securePassword123"
-  }'
+  -d '{"email": "admin@example.com", "password": "securePassword123"}'
 ```
 
-### Use Token for Protected Routes
-```bash
-# Get current user profile
-curl -X GET http://localhost:3000/auth/me \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE"
+### Protected Routes
 
-# Create a city (protected)
+```bash
+# Get cities with pagination
+curl -X GET "http://localhost:3000/cities?page=1" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+
+# Create city
 curl -X POST http://localhost:3000/cities \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"name": "New York", "description": "The Big Apple"}'
 ```
 
 ## 📄 Database Schema
 
-### User Schema
+### User
+
 ```json
 {
-  "id": "number (auto-generated)",
-  "email": "string (unique, required)",
+  "id": "number",
+  "email": "string (unique)",
   "password": "string (hashed)",
-  "firstName": "string (required)",
-  "lastName": "string (required)",
-  "role": "string (admin | user)"
+  "firstName": "string",
+  "lastName": "string",
+  "role": "admin | user",
+  "refreshToken": "string (hashed)"
 }
 ```
 
-### City Schema
+### City
+
 ```json
 {
-  "id": "number (auto-generated)",
-  "name": "string (unique, required)",
-  "description": "string (optional)",
-  "active": "boolean (default: true)"
+  "id": "number",
+  "name": "string (unique)",
+  "description": "string",
+  "active": "boolean",
+  "deletedAt": "Date | null"
 }
 ```
 
 ## 🔐 Authentication & Authorization
 
-- **JWT** is issued at login and must be included in `Authorization: Bearer <token>` for protected routes
-- **Role-Based Access Control (RBAC)** is implemented using custom decorators and guards
-- Example: Only `admin` role can access `/users` endpoint
-- Passwords are hashed using bcrypt before storing in database
+- JWT tokens for authentication (access + refresh)
+- Role-based access control with custom guards
+- Passwords hashed with bcrypt
+- Refresh tokens securely stored in database
 
 ## 🗂️ Project Structure
 
 ```
 src/
-├── auth/
-│   ├── auth.controller.ts
-│   ├── auth.service.ts
-│   ├── jwt.strategy.ts
-│   └── jwt-auth.guard.ts
-├── users/
-│   ├── users.controller.ts
-│   ├── users.service.ts
-│   └── entities/user.entity.ts
-├── cities/
-│   ├── cities.controller.ts
-│   ├── cities.service.ts
-│   └── entities/city.entity.ts
-├── common/
-│   ├── decorators/roles.decorator.ts
-│   └── guards/roles.guard.ts
+├── auth/           # Authentication logic
+├── users/          # User management
+├── cities/         # Cities CRUD
+├── common/         # Guards, decorators, middleware
 ├── app.module.ts
 └── main.ts
 ```
@@ -193,53 +182,41 @@ src/
 ## 📜 Available Scripts
 
 ```bash
-# Development
-npm run start:dev    # Start in watch mode
-npm run start:debug  # Start in debug mode
-
-# Production  
-npm run build        # Build the app
-npm run start:prod   # Start production server
-
-# Testing
-npm run test         # Run unit tests
-npm run test:e2e     # Run e2e tests
-npm run test:cov     # Test coverage
+npm run start:dev    # Development server
+npm run start:prod   # Production server
+npm run build        # Build application
+npm run test         # Run tests
 ```
 
 ## 🔧 Troubleshooting
 
-### Common Issues
+**Database Issues:**
 
-**Database Connection Error:**
-```bash
-# Make sure PostgreSQL is running
-sudo service postgresql start
+- Ensure PostgreSQL is running
+- Check user permissions
 
-# Check if user exists
-psql -U postgres -c "\du"
-```
+**Token Issues:**
 
-**JWT Token Issues:**
-- Ensure `JWT_SECRET` is set in `.env`
-- Check token format: `Authorization: Bearer <token>`
-- Verify token hasn't expired (default: 1 hour)
+- Verify JWT secrets in `.env`
+- Use refresh endpoint when access token expires
+- Check `Authorization: Bearer <token>` format
 
 **Permission Denied:**
-- Check user role in database
-- Ensure you're using correct endpoint permissions
+
+- Verify user role in database
+- Check endpoint permissions (admin vs user)
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create feature branch
+3. Commit changes
+4. Push and create Pull Request
 
 ---
 
 **Happy Coding! 🚀**
 
 ### Tags
-`nestjs` `typeorm` `postgresql` `jwt-auth` `rbac` `crud-api` `backend` `authentication` `authorization` `typescript`
+
+`nestjs` `typeorm` `postgresql` `jwt-auth` `refresh-tokens` `rbac` `crud-api` `typescript`
