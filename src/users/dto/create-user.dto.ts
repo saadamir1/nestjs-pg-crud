@@ -1,5 +1,11 @@
 // src/users/dto/create-user.dto.ts
-import { IsEmail, IsEnum, IsNotEmpty, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  MinLength,
+} from 'class-validator';
 
 export class CreateUserDto {
   @IsEmail()
@@ -16,4 +22,7 @@ export class CreateUserDto {
 
   @IsEnum(['user', 'admin'], { message: 'Role must be either user or admin' })
   role?: 'user' | 'admin';
+
+  @IsOptional()
+  refreshToken?: string;
 }
