@@ -5,6 +5,8 @@ import {
   UnauthorizedException,
   Get,
   UseGuards,
+  Req,
+  ForbiddenException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
@@ -42,9 +44,16 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() body: { email: string; password: string }) {
-    const token = await this.authService.login(body.email, body.password);
-    console.log('Token:', token);
-    return token;
+    const tokens = await this.authService.login(body.email, body.password);
+    return tokens;
+  }
+
+  @Post('refresh')
+  async refresh(@Body() body: { userId: number; refreshToken: string }) {
+    if (!body.userId || !body.refreshToken) {
+      throw new ForbiddenException('Missing credentials');
+    }
+    return this.authService.refresh(body.userId, body.refreshToken);
   }
 
   @Get('me')
