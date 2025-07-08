@@ -71,12 +71,12 @@ API available at `http://localhost:3000`
 
 ### 🔐 Auth
 
-| Method | Endpoint         | Description          |
-| ------ | ---------------- | -------------------- |
-| `POST` | `/auth/register` | Register user        |
-| `POST` | `/auth/login`    | Login and get tokens |
-| `POST` | `/auth/refresh`  | Refresh access token |
-| `GET`  | `/auth/me`       | Get current user     |
+| Method | Endpoint         | Description                |
+| ------ | ---------------- | -------------------------- |
+| `POST` | `/auth/register` | Register user (admin only) |
+| `POST` | `/auth/login`    | Login and get tokens       |
+| `POST` | `/auth/refresh`  | Refresh access token       |
+| `GET`  | `/auth/me`       | Get current user           |
 
 ### 👤 Users (Protected)
 
@@ -88,13 +88,13 @@ API available at `http://localhost:3000`
 
 ### 🌍 Cities (Protected)
 
-| Method   | Endpoint         | Description          |
-| -------- | ---------------- | -------------------- |
-| `POST`   | `/cities`        | Create city          |
-| `GET`    | `/cities?page=1` | Get paginated cities |
-| `GET`    | `/cities/:id`    | Get city by ID       |
-| `PATCH`  | `/cities/:id`    | Update city          |
-| `DELETE` | `/cities/:id`    | Soft delete city     |
+| Method   | Endpoint                  | Description          |
+| -------- | ------------------------- | -------------------- |
+| `POST`   | `/cities`                 | Create city          |
+| `GET`    | `/cities?page=1&limit=10` | Get paginated cities |
+| `GET`    | `/cities/:id`             | Get city by ID       |
+| `PATCH`  | `/cities/:id`             | Update city          |
+| `DELETE` | `/cities/:id`             | Soft delete city     |
 
 ## 🔁 Token Flow
 
@@ -107,22 +107,23 @@ API available at `http://localhost:3000`
 ### Register & Login
 
 ```bash
-# Register
+# Register (admin only - requires JWT token)
 curl -X POST http://localhost:3000/auth/register \
+  -H "Authorization: Bearer ADMIN_JWT_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"email": "admin@example.com", "password": "securePassword123", "firstName": "John", "lastName": "Doe", "role": "admin"}'
+  -d '{"email": "user@example.com", "password": "securePassword123", "firstName": "John", "lastName": "Doe"}'
 
 # Login
 curl -X POST http://localhost:3000/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email": "admin@example.com", "password": "securePassword123"}'
+  -d '{"email": "user@example.com", "password": "securePassword123"}'
 ```
 
 ### Protected Routes
 
 ```bash
-# Get cities with pagination
-curl -X GET "http://localhost:3000/cities?page=1" \
+# Get cities with pagination (default: page=1, limit=10)
+curl -X GET "http://localhost:3000/cities?page=1&limit=10" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 
 # Create city
@@ -148,15 +149,22 @@ curl -X POST http://localhost:3000/cities \
 }
 ```
 
-### City
+### City (Pagination Response)
 
 ```json
 {
-  "id": "number",
-  "name": "string (unique)",
-  "description": "string",
-  "active": "boolean",
-  "deletedAt": "Date | null"
+  "data": [
+    {
+      "id": "number",
+      "name": "string (unique)",
+      "description": "string",
+      "active": "boolean",
+      "deletedAt": "Date | null"
+    }
+  ],
+  "total": "number",
+  "page": "number",
+  "lastPage": "number"
 }
 ```
 
