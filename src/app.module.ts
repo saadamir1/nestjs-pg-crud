@@ -11,12 +11,12 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }), // Load environment variables globally
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        console.log('DB_HOST:', configService.get('DB_HOST')); // check output
+        console.log('DB_HOST:', configService.get('DB_HOST'));
         return {
           type: 'postgres',
           host: configService.get<string>('DB_HOST'),
@@ -26,7 +26,13 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
           database: configService.get<string>('DB_NAME'),
           entities: [join(process.cwd(), 'dist', '**', '*.entity{.ts,.js}')],
           autoLoadEntities: true,
-          synchronize: true,
+          // Remove synchronize in production and use migrations instead
+          synchronize: configService.get<string>('NODE_ENV') === 'development',
+          // Migration configuration
+          migrations: [join(process.cwd(), 'dist', 'migrations', '*.{ts,js}')],
+          migrationsTableName: 'migrations',
+          migrationsRun: configService.get<string>('NODE_ENV') === 'production',
+          logging: configService.get<string>('NODE_ENV') === 'development',
         };
       },
     }),
@@ -39,6 +45,6 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggerMiddleware).forRoutes('*'); // logs all routes
+    consumer.apply(LoggerMiddleware).forRoutes('*');
   }
 }
