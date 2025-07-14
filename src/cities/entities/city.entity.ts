@@ -19,6 +19,9 @@ export class City {
   @Column({ type: 'boolean', default: true })
   active: boolean;
 
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  country: string;
+
   @DeleteDateColumn({ nullable: true })
   deletedAt?: Date;
 }
