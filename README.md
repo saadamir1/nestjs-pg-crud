@@ -1,11 +1,11 @@
 # NestJS PostgreSQL CRUD API with Auth & RBAC
 
-A full-featured REST API built with NestJS, PostgreSQL, and TypeORM with JWT authentication, refresh tokens, role-based access control, and CRUD operations.
+A full-featured REST API built with NestJS, PostgreSQL, and TypeORM with JWT authentication, refresh tokens, role-based access control, database migrations, and CRUD operations.
 
 ## 🛠️ Tech Stack
 
 - **NestJS** - Progressive Node.js framework
-- **TypeORM** - ORM for TypeScript
+- **TypeORM** - ORM for TypeScript with migration support
 - **PostgreSQL** - Relational database
 - **JWT** - Access and refresh token authentication
 - **bcrypt** - Password hashing
@@ -22,8 +22,10 @@ A full-featured REST API built with NestJS, PostgreSQL, and TypeORM with JWT aut
 - 🧾 **Request Logging Middleware**
 - 🚀 **RESTful API Structure**
 - 📊 **Database Integration** - PostgreSQL with TypeORM
+- 🔄 **Database Migrations** - Version control for database schema
 - 🎯 **Type Safety** - Full TypeScript support
 - 🧪 **Easy Testing** - Ready for Postman/curl
+- 🖥️ **Frontend Test Page** - Basic HTML interface for API testing
 
 ## 🚀 Quick Start
 
@@ -57,9 +59,20 @@ JWT_SECRET=jwt-secret-key
 JWT_EXPIRES_IN=900s
 JWT_REFRESH_SECRET=jwt-refresh-secret
 JWT_REFRESH_EXPIRES_IN=7d
+NODE_ENV=development
 ```
 
-### 4. Run Application
+### 4. Run Database Migrations
+
+```bash
+# Run existing migrations
+npm run migration:run
+
+# Check migration status
+npm run migration:show
+```
+
+### 5. Run Application
 
 ```bash
 npm run start:dev
@@ -102,6 +115,48 @@ API available at `http://localhost:3000`
 - **Refresh Token** stored securely in DB (7 days)
 - Use `/auth/refresh` to get new tokens without re-login
 
+## 🗃️ Database Migrations
+
+### Migration Commands
+
+```bash
+# Generate migration from entity changes
+npm run migration:generate src/migrations/YourMigrationName
+
+# Create empty migration
+npm run migration:create src/migrations/YourMigrationName
+
+# Run pending migrations
+npm run migration:run
+
+# Revert last migration
+npm run migration:revert
+
+# Show migration status
+npm run migration:show
+```
+
+### Migration Workflow
+
+1. **Modify entities** → Update your TypeORM entities
+2. **Generate migration** → `npm run migration:generate src/migrations/FeatureName`
+3. **Review migration** → Check generated SQL in migration file
+4. **Run migration** → `npm run migration:run`
+5. **Deploy** → Migrations run automatically in production
+
+### Production Deployment
+
+```bash
+# Build application
+npm run build
+
+# Run migrations
+npm run migration:run
+
+# Start production server
+npm run start:prod
+```
+
 ## 🧪 Testing Examples
 
 ### Register & Login
@@ -132,6 +187,10 @@ curl -X POST http://localhost:3000/cities \
   -H "Content-Type: application/json" \
   -d '{"name": "New York", "description": "The Big Apple"}'
 ```
+
+### Frontend Test Interface
+
+Open `frontend-test.html` in your browser for a basic HTML interface to test the API endpoints.
 
 ## 📄 Database Schema
 
@@ -179,21 +238,37 @@ curl -X POST http://localhost:3000/cities \
 
 ```
 src/
-├── auth/           # Authentication logic
-├── users/          # User management
-├── cities/         # Cities CRUD
-├── common/         # Guards, decorators, middleware
+├── auth/              # Authentication logic
+├── users/             # User management
+├── cities/            # Cities CRUD
+├── common/            # Guards, decorators, middleware
+├── migrations/        # Database migrations
+├── data-source.ts     # TypeORM CLI configuration
+├── migration.config.ts # Migration configuration
 ├── app.module.ts
 └── main.ts
+frontend-test.html     # Basic API testing interface
 ```
 
 ## 📜 Available Scripts
 
 ```bash
-npm run start:dev    # Development server
-npm run start:prod   # Production server
-npm run build        # Build application
-npm run test         # Run tests
+# Development
+npm run start:dev              # Development server
+npm run start:prod             # Production server
+npm run build                  # Build application
+
+# Testing
+npm run test                   # Run tests
+npm run test:watch             # Watch mode tests
+npm run test:e2e               # End-to-end tests
+
+# Database Migrations
+npm run migration:generate     # Generate migration from entities
+npm run migration:create       # Create empty migration
+npm run migration:run          # Run pending migrations
+npm run migration:revert       # Revert last migration
+npm run migration:show         # Show migration status
 ```
 
 ## 🔧 Troubleshooting
@@ -202,6 +277,13 @@ npm run test         # Run tests
 
 - Ensure PostgreSQL is running
 - Check user permissions
+- Run `npm run migration:show` to check migration status
+
+**Migration Issues:**
+
+- Ensure `NODE_ENV` is set in `.env`
+- Check `src/data-source.ts` configuration
+- Verify migration files are in `src/migrations/`
 
 **Token Issues:**
 
@@ -218,8 +300,10 @@ npm run test         # Run tests
 
 1. Fork the repository
 2. Create feature branch
-3. Commit changes
-4. Push and create Pull Request
+3. Make changes and add migrations if needed
+4. Run `npm run migration:generate` for schema changes
+5. Commit changes with descriptive messages
+6. Push and create Pull Request
 
 ---
 
@@ -227,4 +311,4 @@ npm run test         # Run tests
 
 ### Tags
 
-`nestjs` `typeorm` `postgresql` `jwt-auth` `refresh-tokens` `rbac` `crud-api` `typescript`
+`nestjs` `typeorm` `postgresql` `jwt-auth` `refresh-tokens` `rbac` `crud-api` `typescript` `migrations` `database-versioning`
