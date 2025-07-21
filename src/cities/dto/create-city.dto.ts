@@ -1,5 +1,18 @@
+import { IsString, IsOptional, IsBoolean } from 'class-validator';
+
 export class CreateCityDto {
+  @IsString()
   name: string;
-  description: string;
-  active: boolean;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  active?: boolean;
+
+  @IsString()
+  @IsOptional()
+  country?: string;
 }
