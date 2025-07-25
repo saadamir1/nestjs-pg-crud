@@ -32,7 +32,8 @@ export class CitiesService {
   }
 
   async findOne(id: number) {
-    return await this.citiesRepository.findOne({ where: { id } });
+    const city = await this.citiesRepository.findOne({ where: { id } });
+    return city || null;
   }
 
   async update(id: number, updateCityDto: UpdateCityDto) {
