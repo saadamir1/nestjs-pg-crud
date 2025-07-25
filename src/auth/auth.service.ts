@@ -46,7 +46,7 @@ export class AuthService {
     if (!passwordMatch) throw new UnauthorizedException('Wrong password');
 
     const tokens = await this.generateTokens(user);
-    await this.updateRefreshToken(user.id, tokens.refresh_token);
+    await this.updateRefreshToken(user.id, tokens.refresh_token); // Store hashed refresh token in the databaseS
 
     return tokens;
   }
