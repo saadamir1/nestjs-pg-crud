@@ -21,19 +21,20 @@ describe('Cities (e2e)', () => {
         transform: true,
       }),
     );
-    
+
     await app.init();
 
     // Login to get auth token
     const loginResponse = await request(app.getHttpServer())
       .post('/auth/login')
       .send({
-        email: 'admin@example.com',
-        password: 'password',
+        email: 'admin@gmail.com',
+        password: 'admin',
       })
       .expect(201);
 
     authToken = loginResponse.body.access_token;
+    console.log('Login response:', loginResponse.body);
   });
 
   afterAll(async () => {
@@ -94,9 +95,7 @@ describe('Cities (e2e)', () => {
     });
 
     it('should fail without authentication', () => {
-      return request(app.getHttpServer())
-        .get('/cities')
-        .expect(401);
+      return request(app.getHttpServer()).get('/cities').expect(401);
     });
   });
 
