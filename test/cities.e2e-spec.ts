@@ -62,9 +62,19 @@ describe('Cities (e2e)', () => {
 
   afterAll(async () => {
     // Clean up test data
-    await cityRepository.query("DELETE FROM cities WHERE name LIKE '%_test_%'");
-    await app.close();
-  });
+    try {
+      await cityRepository.query(
+        "DELETE FROM cities WHERE name LIKE '%TestCity%' OR name LIKE '%GetTestCity%' OR name LIKE '%UpdateTestCity%' OR name LIKE '%DeleteTestCity%' OR name LIKE '%DuplicateCity%'",
+      );
+    } catch (error) {
+      console.log('Cleanup error:', error.message);
+    }
+
+    // Properly close the app and all connections
+    if (app) {
+      await app.close(); // ← This prevents worker process hanging
+    }
+  }, 30000); // ← 30 second timeout
 
   describe('/cities (POST)', () => {
     it('should create a new city', async () => {
