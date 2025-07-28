@@ -14,7 +14,15 @@ import { CurrentUser } from './decorators/current-user.decorator';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiBody,
+} from '@nestjs/swagger';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -25,6 +33,25 @@ export class AuthController {
   @Post('register')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Register new user (Admin only)' })
+  @ApiResponse({ status: 201, description: 'User successfully registered' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Admin access required',
+  })
+  @ApiResponse({ status: 409, description: 'Email already exists' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        firstName: { type: 'string', example: 'John' },
+        lastName: { type: 'string', example: 'Doe' },
+        email: { type: 'string', example: 'john@example.com' },
+        password: { type: 'string', example: 'securePassword123' },
+      },
+    },
+  })
   async register(
     @Body()
     body: {
@@ -47,12 +74,45 @@ export class AuthController {
   }
 
   @Post('login')
+  @ApiOperation({ summary: 'Login user' })
+  @ApiResponse({
+    status: 201,
+    description: 'Login successful',
+    schema: {
+      type: 'object',
+      properties: {
+        access_token: { type: 'string' },
+        refresh_token: { type: 'string' },
+      },
+    },
+  })
+  @ApiResponse({ status: 401, description: 'Invalid credentials' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        email: { type: 'string', example: 'admin@gmail.com' },
+        password: { type: 'string', example: 'admin' },
+      },
+    },
+  })
   async login(@Body() body: { email: string; password: string }) {
     const tokens = await this.authService.login(body.email, body.password);
     return tokens;
   }
 
   @Post('refresh')
+  @ApiOperation({ summary: 'Refresh access token' })
+  @ApiResponse({ status: 201, description: 'Token refreshed successfully' })
+  @ApiResponse({ status: 403, description: 'Invalid refresh token' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        refreshToken: { type: 'string', example: 'your-refresh-token-here' },
+      },
+    },
+  })
   async refresh(@Body() body: { refreshToken: string }) {
     if (!body.refreshToken) {
       throw new ForbiddenException('Missing refresh token');
@@ -62,6 +122,13 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Get current user profile' })
+  @ApiResponse({
+    status: 200,
+    description: 'User profile retrieved successfully',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   getMe(@CurrentUser() user: any) {
     return user;
   }
