@@ -25,6 +25,7 @@ A full-featured REST API built with NestJS, PostgreSQL, and TypeORM with JWT aut
 - 🔄 **Database Migrations** - Version control for database schema
 - 🎯 **Type Safety** - Full TypeScript support
 - 🧪 **Comprehensive Testing** - Unit tests, E2E tests, and test coverage
+- 📚 **API Documentation** - Interactive Swagger/OpenAPI documentation
 - 🖥️ **Frontend Test Page** - Basic HTML interface for API testing
 - ⚡ **Production Ready** - Error handling, validation, and security best practices
 
@@ -80,6 +81,7 @@ npm run start:dev
 ```
 
 API available at `http://localhost:3000`
+Swagger documentation at `http://localhost:3000/api`
 
 ## 🧪 API Endpoints
 
@@ -98,7 +100,7 @@ API available at `http://localhost:3000`
 | ------ | ---------------- | -------------------------- |
 | `GET`  | `/users`         | Get all users (admin only) |
 | `GET`  | `/users/profile` | Get user profile           |
-| `POST` | `/users/`         | Create user (admin only)   |
+| `POST` | `/users/`        | Create user (admin only)   |
 
 ### 🌍 Cities (Protected)
 
@@ -189,6 +191,15 @@ curl -X POST http://localhost:3000/cities \
   -d '{"name": "New York", "description": "The Big Apple"}'
 ```
 
+### API Documentation
+
+Interactive Swagger documentation is available at `http://localhost:3000/api` where you can:
+
+- View all available endpoints
+- Test API calls directly from the browser
+- See request/response schemas
+- Authenticate with JWT tokens
+
 ### Frontend Test Interface
 
 Open `frontend-test.html` in your browser for a basic HTML interface to test the API endpoints.
@@ -269,6 +280,7 @@ npm run test:cov
 ```
 
 **Test Coverage:**
+
 - ✅ **Services**: All CRUD operations, authentication, validation
 - ✅ **Controllers**: HTTP endpoints, request/response handling
 - ✅ **Auth**: Login, refresh tokens, JWT validation
@@ -282,6 +294,7 @@ npm run test:e2e
 ```
 
 **E2E Test Coverage:**
+
 - ✅ **Authentication**: Login, protected routes
 - ✅ **Cities CRUD**: Create, read, update, delete operations
 - ✅ **Authorization**: Admin-only endpoints

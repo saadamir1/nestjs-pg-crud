@@ -38,7 +38,9 @@ async function bootstrap() {
   // Swagger configuration
   const config = new DocumentBuilder()
     .setTitle('NestJS PostgreSQL CRUD API')
-    .setDescription('Full-featured REST API with JWT authentication, RBAC, and TypeORM CRUD operations')
+    .setDescription(
+      'Full-featured REST API with JWT authentication, RBAC, and TypeORM CRUD operations',
+    )
     .setVersion('1.0')
     .addBearerAuth(
       {
