@@ -35,6 +35,35 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
+        const databaseUrl = configService.get<string>('DATABASE_URL');
+
+        // If DATABASE_URL is provided (production), use it
+        if (databaseUrl) {
+          console.log('Using DATABASE_URL for connection');
+          return {
+            type: 'postgres',
+            url: databaseUrl,
+            entities: [join(process.cwd(), 'dist', '**', '*.entity{.ts,.js}')],
+            autoLoadEntities: true,
+            // Remove synchronize in production and use migrations instead
+            synchronize: false, // Always false in production
+            // Migration configuration
+            migrations: [
+              join(process.cwd(), 'dist', 'migrations', '*.{ts,js}'),
+            ],
+            migrationsTableName: 'migrations',
+            migrationsRun:
+              configService.get<string>('NODE_ENV') === 'production',
+            logging: configService.get<string>('NODE_ENV') === 'development',
+            ssl:
+              configService.get<string>('NODE_ENV') === 'production'
+                ? { rejectUnauthorized: false }
+                : false,
+          };
+        }
+
+        // Fallback to individual variables (development)
+        console.log('Using individual DB variables for connection');
         console.log('DB_HOST:', configService.get('DB_HOST'));
         return {
           type: 'postgres',
@@ -45,12 +74,10 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
           database: configService.get<string>('DB_NAME'),
           entities: [join(process.cwd(), 'dist', '**', '*.entity{.ts,.js}')],
           autoLoadEntities: true,
-          // Remove synchronize in production and use migrations instead
           synchronize: configService.get<string>('NODE_ENV') === 'development',
-          // Migration configuration
           migrations: [join(process.cwd(), 'dist', 'migrations', '*.{ts,js}')],
           migrationsTableName: 'migrations',
-          migrationsRun: configService.get<string>('NODE_ENV') === 'production',
+          migrationsRun: false,
           logging: configService.get<string>('NODE_ENV') === 'development',
         };
       },

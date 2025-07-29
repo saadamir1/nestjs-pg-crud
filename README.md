@@ -250,15 +250,18 @@ Open `frontend-test.html` in your browser for a basic HTML interface to test the
 ## 🛡️ Rate Limiting
 
 **Global Rate Limits:**
+
 - **Short**: 3 requests per second
-- **Medium**: 20 requests per 10 seconds  
+- **Medium**: 20 requests per 10 seconds
 - **Long**: 100 requests per minute
 
 **Endpoint-Specific Limits:**
+
 - **Login**: 5 attempts per minute (prevents brute force)
 - **Refresh Token**: 10 attempts per minute
 
 **Headers Returned:**
+
 - `X-RateLimit-Limit`: Request limit
 - `X-RateLimit-Remaining`: Remaining requests
 - `X-RateLimit-Reset`: Reset time
