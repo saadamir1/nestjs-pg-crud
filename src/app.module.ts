@@ -46,14 +46,14 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
             entities: [join(process.cwd(), 'dist', '**', '*.entity{.ts,.js}')],
             autoLoadEntities: true,
             // Remove synchronize in production and use migrations instead
-            // Temporarily enable synchronize for initial production setup
-            synchronize: true, // Set to false after first successful deployment
+            synchronize: false, // Always false in production
             // Migration configuration
             migrations: [
               join(process.cwd(), 'dist', 'migrations', '*.{ts,js}'),
             ],
             migrationsTableName: 'migrations',
-            migrationsRun: false, // Disable migration running temporarily
+            migrationsRun:
+              configService.get<string>('NODE_ENV') === 'production',
             logging: configService.get<string>('NODE_ENV') === 'development',
             ssl:
               configService.get<string>('NODE_ENV') === 'production'
