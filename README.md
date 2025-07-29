@@ -27,6 +27,7 @@ A full-featured REST API built with NestJS, PostgreSQL, and TypeORM with JWT aut
 - 🧪 **Comprehensive Testing** - Unit tests, E2E tests, and test coverage
 - 📚 **API Documentation** - Interactive Swagger/OpenAPI documentation
 - 🛡️ **Rate Limiting** - Prevents API abuse with configurable limits
+- 🚀 **Live Deployment** - Production-ready app deployed on Render.com
 - 🖥️ **Frontend Test Page** - Basic HTML interface for API testing
 - ⚡ **Production Ready** - Error handling, validation, and security best practices
 
@@ -81,8 +82,13 @@ npm run migration:show
 npm run start:dev
 ```
 
-API available at `http://localhost:3000`
-Swagger documentation at `http://localhost:3000/api`
+**Local Development:**
+- API: `http://localhost:3000`
+- Swagger: `http://localhost:3000/api`
+
+**🚀 Live Production:**
+- API: `https://nestjs-pg-crud.onrender.com`
+- Swagger: `https://nestjs-pg-crud.onrender.com/api`
 
 ## 🧪 API Endpoints
 
@@ -194,12 +200,15 @@ curl -X POST http://localhost:3000/cities \
 
 ### API Documentation
 
-Interactive Swagger documentation is available at `http://localhost:3000/api` where you can:
-
+**🚀 Live Production API:**
+Interactive Swagger documentation is available at `https://nestjs-pg-crud.onrender.com/api` where you can:
 - View all available endpoints
 - Test API calls directly from the browser
 - See request/response schemas
 - Authenticate with JWT tokens
+
+**Local Development:**
+Swagger documentation available at `http://localhost:3000/api`
 
 ### Frontend Test Interface
 
@@ -435,6 +444,7 @@ npm run test:e2e
 - **100% TypeScript** - Full type safety
 - **JWT Security** - Access + refresh token implementation
 - **Database Migrations** - Version-controlled schema changes
+- **Live Deployment** - Successfully deployed on Render.com
 - **Production Ready** - Error handling, validation, logging
 
 ### Tags
