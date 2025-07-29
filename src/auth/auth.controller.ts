@@ -21,6 +21,7 @@ import {
   ApiBearerAuth,
   ApiBody,
 } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -74,6 +75,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 attempts per minute
   @ApiOperation({ summary: 'Login user' })
   @ApiResponse({
     status: 201,
@@ -102,6 +104,7 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @Throttle({ default: { limit: 10, ttl: 60000 } }) // 10 attempts per minute
   @ApiOperation({ summary: 'Refresh access token' })
   @ApiResponse({ status: 201, description: 'Token refreshed successfully' })
   @ApiResponse({ status: 403, description: 'Invalid refresh token' })
