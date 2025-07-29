@@ -26,6 +26,7 @@ A full-featured REST API built with NestJS, PostgreSQL, and TypeORM with JWT aut
 - 🎯 **Type Safety** - Full TypeScript support
 - 🧪 **Comprehensive Testing** - Unit tests, E2E tests, and test coverage
 - 📚 **API Documentation** - Interactive Swagger/OpenAPI documentation
+- 🛡️ **Rate Limiting** - Prevents API abuse with configurable limits
 - 🖥️ **Frontend Test Page** - Basic HTML interface for API testing
 - ⚡ **Production Ready** - Error handling, validation, and security best practices
 
@@ -246,6 +247,22 @@ Open `frontend-test.html` in your browser for a basic HTML interface to test the
 - Passwords hashed with bcrypt
 - Refresh tokens securely stored in database
 
+## 🛡️ Rate Limiting
+
+**Global Rate Limits:**
+- **Short**: 3 requests per second
+- **Medium**: 20 requests per 10 seconds  
+- **Long**: 100 requests per minute
+
+**Endpoint-Specific Limits:**
+- **Login**: 5 attempts per minute (prevents brute force)
+- **Refresh Token**: 10 attempts per minute
+
+**Headers Returned:**
+- `X-RateLimit-Limit`: Request limit
+- `X-RateLimit-Remaining`: Remaining requests
+- `X-RateLimit-Reset`: Reset time
+
 ## 🗂️ Project Structure
 
 ```
@@ -359,6 +376,13 @@ npm run migration:show         # Show migration status
 
 - Verify user role in database
 - Check endpoint permissions (admin vs user)
+
+**Rate Limiting Issues:**
+
+- Check `X-RateLimit-*` headers in response
+- Wait for rate limit reset time
+- Consider implementing exponential backoff
+- Contact admin if limits seem too restrictive
 
 **Test Issues:**
 
