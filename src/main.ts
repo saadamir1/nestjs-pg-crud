@@ -18,7 +18,7 @@ async function bootstrap() {
   } else {
     // Production CORS - restrictive
     app.enableCors({
-      origin: ['https://production-domain.com'],
+      origin: ['https://pg-crud-frontend-44cu.vercel.app'],
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization'],
       credentials: true,
