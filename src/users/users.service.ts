@@ -40,6 +40,10 @@ export class UsersService {
     return this.userRepository.findOne({ where: { email } });
   }
 
+  async findByRole(role: string): Promise<User[]> {
+    return this.userRepository.find({ where: { role } });
+  }
+
   async create(createUserDto: CreateUserDto) {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     const user = this.userRepository.create({
