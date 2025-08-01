@@ -59,12 +59,15 @@ async function bootstrap() {
     .addTag('auth', 'Authentication endpoints')
     .addTag('users', 'User management endpoints')
     .addTag('cities', 'Cities CRUD endpoints')
+    .addTag('upload', 'File upload endpoints')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document, {
     swaggerOptions: {
       persistAuthorization: true,
+      supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
+      tryItOutEnabled: true,
     },
   });
 
