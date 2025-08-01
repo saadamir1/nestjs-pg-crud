@@ -138,7 +138,17 @@ export class AuthController {
 
   @Post('bootstrap-admin')
   @ApiOperation({ summary: 'Create first admin user (temporary endpoint)' })
-  @ApiResponse({ status: 201, description: 'Admin user created successfully' })
+  @ApiResponse({
+    status: 201,
+    description: 'Admin user created successfully with tokens',
+    schema: {
+      type: 'object',
+      properties: {
+        access_token: { type: 'string' },
+        refresh_token: { type: 'string' },
+      },
+    },
+  })
   @ApiBody({
     schema: {
       type: 'object',
@@ -165,9 +175,16 @@ export class AuthController {
       throw new UnauthorizedException('Admin user already exists');
     }
 
-    return this.usersService.create({
+    // Create admin user
+    const adminUser = await this.usersService.create({
       ...body,
       role: 'admin',
     });
+
+    // Generate tokens for immediate use
+    const tokens = await this.authService.generateTokens(adminUser);
+    await this.authService.updateRefreshToken(adminUser.id, tokens.refresh_token);
+
+    return tokens;
   }
 }
