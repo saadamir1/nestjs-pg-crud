@@ -135,4 +135,39 @@ export class AuthController {
   getMe(@CurrentUser() user: any) {
     return user;
   }
+
+  @Post('bootstrap-admin')
+  @ApiOperation({ summary: 'Create first admin user (temporary endpoint)' })
+  @ApiResponse({ status: 201, description: 'Admin user created successfully' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        email: { type: 'string', example: 'admin@gmail.com' },
+        password: { type: 'string', example: 'admin' },
+        firstName: { type: 'string', example: 'Admin' },
+        lastName: { type: 'string', example: 'User' },
+      },
+    },
+  })
+  async bootstrapAdmin(
+    @Body()
+    body: {
+      email: string;
+      password: string;
+      firstName: string;
+      lastName: string;
+    },
+  ) {
+    // Check if any admin already exists
+    const existingAdmin = await this.usersService.findByRole('admin');
+    if (existingAdmin && existingAdmin.length > 0) {
+      throw new UnauthorizedException('Admin user already exists');
+    }
+
+    return this.usersService.create({
+      ...body,
+      role: 'admin',
+    });
+  }
 }
