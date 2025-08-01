@@ -9,6 +9,7 @@ import { join } from 'path';
 import { CitiesModule } from './cities/cities.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { UploadModule } from './upload/upload.module';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 
 @Module({
@@ -85,6 +86,7 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
     CitiesModule,
     UsersModule,
     AuthModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [
