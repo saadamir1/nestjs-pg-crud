@@ -40,7 +40,7 @@ export class UsersService {
     return this.userRepository.findOne({ where: { email } });
   }
 
-  async findByRole(role: string): Promise<User[]> {
+  async findByRole(role: 'user' | 'admin'): Promise<User[]> {
     return this.userRepository.find({ where: { role } });
   }
 
