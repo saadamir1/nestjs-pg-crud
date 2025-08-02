@@ -9,6 +9,9 @@ A full-featured REST API built with NestJS, PostgreSQL, and TypeORM with JWT aut
 - **PostgreSQL** - Relational database
 - **JWT** - Access and refresh token authentication
 - **bcrypt** - Password hashing
+- **Cloudinary** - Cloud-based image storage and optimization
+- **Winston** - Logging library
+- **Multer** - File upload handling
 - **TypeScript** - Type safety
 
 ## ✨ Features
@@ -19,7 +22,9 @@ A full-featured REST API built with NestJS, PostgreSQL, and TypeORM with JWT aut
 - 🔒 **Hashed Passwords with bcrypt**
 - 📋 **Pagination Support** (e.g., `/cities?page=2`)
 - 🧹 **Soft Delete Support** (e.g., cities)
-- 🧾 **Request Logging Middleware**
+- 📁 **File Upload** - Image upload with Cloudinary integration
+- 🖼️ **Image Processing** - Automatic optimization and transformation
+- 🧾 **Request Logging** - Winston logger with file output
 - 🚀 **RESTful API Structure**
 - 📊 **Database Integration** - PostgreSQL with TypeORM
 - 🔄 **Database Migrations** - Version control for database schema
@@ -64,6 +69,14 @@ JWT_EXPIRES_IN=900s
 JWT_REFRESH_SECRET=jwt-refresh-secret
 JWT_REFRESH_EXPIRES_IN=7d
 NODE_ENV=development
+
+# Cloudinary Configuration (for file uploads)
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+
+# Production Database URL (optional)
+DATABASE_URL=postgresql://username:password@host:port/database
 ```
 
 ### 4. Run Database Migrations
@@ -118,6 +131,13 @@ npm run start:dev
 | `GET`    | `/cities/:id`             | Get city by ID       |
 | `PATCH`  | `/cities/:id`             | Update city          |
 | `DELETE` | `/cities/:id`             | Soft delete city     |
+
+### 📁 File Upload (Protected)
+
+| Method | Endpoint         | Description                    |
+| ------ | ---------------- | ------------------------------ |
+| `POST` | `/upload/image`  | Upload general image file      |
+| `POST` | `/upload/avatar` | Upload user avatar image       |
 
 ## 🔁 Token Flow
 
@@ -196,6 +216,16 @@ curl -X POST http://localhost:3000/cities \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"name": "New York", "description": "The Big Apple"}'
+
+# Upload image file
+curl -X POST http://localhost:3000/upload/image \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -F "file=@/path/to/your/image.jpg"
+
+# Upload avatar
+curl -X POST http://localhost:3000/upload/avatar \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -F "file=@/path/to/avatar.png"
 ```
 
 ### API Documentation
@@ -282,12 +312,16 @@ src/
 ├── auth/              # Authentication logic
 ├── users/             # User management
 ├── cities/            # Cities CRUD
-├── common/            # Guards, decorators, middleware
+├── upload/            # File upload functionality
+├── common/            # Guards, decorators, middleware, services
+│   ├── services/      # Cloudinary service
+│   └── middleware/    # Logger middleware
 ├── migrations/        # Database migrations
 ├── data-source.ts     # TypeORM CLI configuration
 ├── migration.config.ts # Migration configuration
 ├── app.module.ts
 └── main.ts
+logs/                  # Application logs
 frontend-test.html     # Basic API testing interface
 ```
 
@@ -389,6 +423,13 @@ npm run migration:show         # Show migration status
 - Verify user role in database
 - Check endpoint permissions (admin vs user)
 
+**File Upload Issues:**
+
+- Check Cloudinary credentials in `.env`
+- Verify file size (max 5MB) and type (JPEG, PNG, GIF, WebP)
+- Ensure proper `multipart/form-data` content type
+- Check network connectivity to Cloudinary
+
 **Rate Limiting Issues:**
 
 - Check `X-RateLimit-*` headers in response
@@ -449,4 +490,4 @@ npm run test:e2e
 
 ### Tags
 
-`nestjs` `typeorm` `postgresql` `jwt-auth` `refresh-tokens` `rbac` `crud-api` `typescript` `migrations` `database-versioning` `jest-testing` `e2e-testing` `production-ready`
+`nestjs` `typeorm` `postgresql` `jwt-auth` `refresh-tokens` `rbac` `crud-api` `typescript` `migrations` `database-versioning` `jest-testing` `e2e-testing` `file-upload` `cloudinary` `winston-logging` `production-ready`
