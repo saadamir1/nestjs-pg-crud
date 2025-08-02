@@ -323,6 +323,16 @@ src/
 └── main.ts
 logs/                  # Application logs
 frontend-test.html     # Basic API testing interface
+```e, services
+│   ├── services/      # Cloudinary service
+│   └── middleware/    # Logger middleware
+├── migrations/        # Database migrations
+├── data-source.ts     # TypeORM CLI configuration
+├── migration.config.ts # Migration configuration
+├── app.module.ts
+└── main.ts
+logs/                  # Application logs
+frontend-test.html     # Basic API testing interface
 ```
 
 ## 🧪 Testing
