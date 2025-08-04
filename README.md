@@ -134,10 +134,12 @@ npm run start:dev
 
 ### 📁 File Upload (Protected)
 
-| Method | Endpoint         | Description                    |
-| ------ | ---------------- | ------------------------------ |
-| `POST` | `/upload/image`  | Upload general image file      |
-| `POST` | `/upload/avatar` | Upload user avatar image       |
+| Method | Endpoint                        | Description                           |
+| ------ | ------------------------------- | ------------------------------------- |
+| `POST` | `/upload/image`                 | Upload general image file             |
+| `POST` | `/upload/avatar`                | Upload user avatar image              |
+| `POST` | `/upload/profile-picture/:userId` | Upload and update user profile picture |
+| `POST` | `/upload/city-image/:cityId`    | Upload and update city image          |
 
 ## 🔁 Token Flow
 
@@ -226,6 +228,16 @@ curl -X POST http://localhost:3000/upload/image \
 curl -X POST http://localhost:3000/upload/avatar \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -F "file=@/path/to/avatar.png"
+
+# Upload user profile picture
+curl -X POST http://localhost:3000/upload/profile-picture/2 \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -F "file=@/path/to/profile.jpg"
+
+# Upload city image
+curl -X POST http://localhost:3000/upload/city-image/1 \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -F "file=@/path/to/city.jpg"
 ```
 
 ### API Documentation
