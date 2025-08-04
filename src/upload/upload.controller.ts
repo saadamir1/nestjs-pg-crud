@@ -5,6 +5,7 @@ import {
   UploadedFile,
   UseGuards,
   BadRequestException,
+  Param,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
@@ -89,6 +90,62 @@ export class UploadController {
     }
 
     const url = await this.uploadService.uploadImage(file, 'avatars');
+    return { url };
+  }
+
+  @Post('profile-picture/:userId')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({ summary: 'Upload and update user profile picture' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Profile picture upload',
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  async uploadProfilePicture(
+    @Param('userId') userId: string,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+
+    const url = await this.uploadService.uploadProfilePicture(+userId, file);
+    return { url };
+  }
+
+  @Post('city-image/:cityId')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({ summary: 'Upload and update city image' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'City image upload',
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  async uploadCityImage(
+    @Param('cityId') cityId: string,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+
+    const url = await this.uploadService.uploadCityImage(+cityId, file);
     return { url };
   }
 }
