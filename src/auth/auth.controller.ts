@@ -132,8 +132,16 @@ export class AuthController {
     description: 'User profile retrieved successfully',
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  getMe(@CurrentUser() user: any) {
-    return user;
+  async getMe(@CurrentUser() user: any) {
+    // Fetch full user data from database to include profilePicture
+    const fullUser = await this.usersService.findOne(user.userId);
+    if (!fullUser) {
+      throw new UnauthorizedException('User not found');
+    }
+    
+    // Remove sensitive data
+    const { password, refreshToken, ...userProfile } = fullUser;
+    return userProfile;
   }
 
   @Post('bootstrap-admin')
