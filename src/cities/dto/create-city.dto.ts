@@ -33,4 +33,13 @@ export class CreateCityDto {
   @IsString()
   @IsOptional()
   country?: string;
+
+  @ApiProperty({
+    example: 'https://res.cloudinary.com/demo/image/upload/v1234567890/cities/city.jpg',
+    description: 'URL of the city image',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  imageUrl?: string;
 }
