@@ -22,6 +22,8 @@ export class CloudinaryService {
             transformation: [
               { width: 1000, height: 1000, crop: 'limit' },
               { quality: 'auto' },
+              { format: 'auto' }, // Auto-convert to best format (WebP, AVIF)
+              { fetch_format: 'auto' }, // Serve best format based on browser
             ],
           },
           (error, result) => {
