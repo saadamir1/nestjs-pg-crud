@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity({ name: 'users' })
 export class User {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'id' })
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({
@@ -35,4 +35,7 @@ export class User {
 
   @Column({ type: 'text', nullable: true })
   refreshToken: string;
+
+  @Column({ type: 'text', nullable: true })
+  profilePicture: string;
 }

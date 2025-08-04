@@ -22,6 +22,9 @@ export class City {
   @Column({ type: 'varchar', length: 50, nullable: true })
   country: string;
 
+  @Column({ type: 'text', nullable: true })
+  imageUrl: string;
+
   @DeleteDateColumn({ nullable: true })
   deletedAt?: Date;
 }
