@@ -13,18 +13,32 @@ export class CloudinaryService {
   }
 
   async uploadFile(file: Express.Multer.File, folder: string): Promise<string> {
+    // Different optimization strategies for different use cases
+    const getTransformation = (folder: string) => {
+      if (folder === 'avatars') {
+        return [
+          { width: 300, height: 300, crop: 'fill', gravity: 'face' }, // Square crop, focus on face
+          { quality: 'auto:good' }, // Higher quality for profile pictures
+          { format: 'auto' },
+          { fetch_format: 'auto' },
+        ];
+      } else {
+        return [
+          { width: 1000, height: 1000, crop: 'limit' }, // Maintain aspect ratio
+          { quality: 'auto' }, // Standard quality for general images
+          { format: 'auto' },
+          { fetch_format: 'auto' },
+        ];
+      }
+    };
+
     return new Promise((resolve, reject) => {
       cloudinary.uploader
         .upload_stream(
           {
             folder,
             resource_type: 'auto',
-            transformation: [
-              { width: 1000, height: 1000, crop: 'limit' },
-              { quality: 'auto' },
-              { format: 'auto' }, // Auto-convert to best format (WebP, AVIF)
-              { fetch_format: 'auto' }, // Serve best format based on browser
-            ],
+            transformation: getTransformation(folder),
           },
           (error, result) => {
             if (error) {
