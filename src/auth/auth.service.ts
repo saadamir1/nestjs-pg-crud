@@ -7,6 +7,7 @@ import {
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { EmailService } from '../common/services/email.service';
+import { AuditService } from '../common/services/audit.service';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 
@@ -16,6 +17,7 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private emailService: EmailService,
+    private auditService: AuditService,
   ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
@@ -58,6 +60,15 @@ export class AuthService {
 
     const tokens = await this.generateTokens(user);
     await this.updateRefreshToken(user.id, tokens.refresh_token);
+
+    // Log successful login
+    await this.auditService.log(
+      user.id,
+      'LOGIN',
+      'User',
+      user.id,
+      'User logged in successfully',
+    );
 
     return tokens;
   }
@@ -138,6 +149,15 @@ export class AuthService {
       resetPasswordToken: null,
       resetPasswordExpires: null,
     } as any);
+
+    // Log password reset
+    await this.auditService.log(
+      user.id,
+      'PASSWORD_RESET',
+      'User',
+      user.id,
+      'Password reset via email',
+    );
 
     return { message: 'Password reset successfully' };
   }
