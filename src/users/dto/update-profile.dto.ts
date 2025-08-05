@@ -1,0 +1,48 @@
+import { IsOptional, IsString, MinLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+
+export class UpdateProfileDto {
+  @ApiProperty({
+    example: 'John',
+    description: 'User first name',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  firstName?: string;
+
+  @ApiProperty({
+    example: 'Doe',
+    description: 'User last name',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  lastName?: string;
+
+  @ApiProperty({
+    example: 'https://example.com/profile.jpg',
+    description: 'Profile picture URL',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  profilePicture?: string;
+}
+
+export class ChangePasswordDto {
+  @ApiProperty({
+    example: 'currentPassword123',
+    description: 'Current password',
+  })
+  @IsString()
+  currentPassword: string;
+
+  @ApiProperty({
+    example: 'newPassword123',
+    description: 'New password (min 4 characters)',
+  })
+  @IsString()
+  @MinLength(4, { message: 'Password must be at least 4 characters long' })
+  newPassword: string;
+}
