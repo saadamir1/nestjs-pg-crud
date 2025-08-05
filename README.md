@@ -1,6 +1,6 @@
-# NestJS PostgreSQL CRUD API with Auth & RBAC
+# NestJS Professional Foundation
 
-A full-featured REST API built with NestJS, PostgreSQL, and TypeORM with JWT authentication, refresh tokens, role-based access control, database migrations, and CRUD operations.
+A comprehensive, production-ready NestJS foundation with advanced authentication, security, file handling, and enterprise-grade features. Built with PostgreSQL, TypeORM, JWT authentication, refresh tokens, role-based access control, audit logging, and comprehensive testing.
 
 ## 🛠️ Tech Stack
 
@@ -58,7 +58,14 @@ GRANT ALL PRIVILEGES ON DATABASE demo TO dev;
 
 ### 3. Environment Variables
 
-Create `.env`:
+Copy and configure environment:
+
+```bash
+cp .env.example .env
+# Edit .env with your actual values
+```
+
+Or create `.env` manually:
 
 ```env
 DB_HOST=127.0.0.1
@@ -103,10 +110,12 @@ npm run start:dev
 ```
 
 **Local Development:**
+
 - API: `http://localhost:3000`
 - Swagger: `http://localhost:3000/api`
 
 **🚀 Live Production:**
+
 - API: `https://nestjs-pg-crud.onrender.com`
 - Swagger: `https://nestjs-pg-crud.onrender.com/api`
 
@@ -114,14 +123,14 @@ npm run start:dev
 
 ### 🔐 Auth
 
-| Method | Endpoint              | Description                |
-| ------ | --------------------- | -------------------------- |
-| `POST` | `/auth/register`      | Register user (admin only) |
-| `POST` | `/auth/login`         | Login and get tokens       |
-| `POST` | `/auth/refresh`       | Refresh access token       |
-| `POST` | `/auth/forgot-password` | Request password reset   |
-| `POST` | `/auth/reset-password`  | Reset password with token|
-| `GET`  | `/auth/me`            | Get current user           |
+| Method | Endpoint                | Description                |
+| ------ | ----------------------- | -------------------------- |
+| `POST` | `/auth/register`        | Register user (admin only) |
+| `POST` | `/auth/login`           | Login and get tokens       |
+| `POST` | `/auth/refresh`         | Refresh access token       |
+| `POST` | `/auth/forgot-password` | Request password reset     |
+| `POST` | `/auth/reset-password`  | Reset password with token  |
+| `GET`  | `/auth/me`              | Get current user           |
 
 ### 👤 Users (Protected)
 
@@ -131,7 +140,9 @@ npm run start:dev
 | `GET`  | `/users/profile` | Get user profile           |
 | `POST` | `/users/`        | Create user (admin only)   |
 
-### 🌍 Cities (Protected)
+### 🌍 Cities (Example Module)
+
+> **Note**: Cities module is included as a complete CRUD example - replace with your business logic.
 
 | Method   | Endpoint                  | Description          |
 | -------- | ------------------------- | -------------------- |
@@ -143,12 +154,12 @@ npm run start:dev
 
 ### 📁 File Upload (Protected)
 
-| Method | Endpoint                        | Description                           |
-| ------ | ------------------------------- | ------------------------------------- |
-| `POST` | `/upload/image`                 | Upload general image file             |
-| `POST` | `/upload/avatar`                | Upload user avatar image              |
+| Method | Endpoint                          | Description                            |
+| ------ | --------------------------------- | -------------------------------------- |
+| `POST` | `/upload/image`                   | Upload general image file              |
+| `POST` | `/upload/avatar`                  | Upload user avatar image               |
 | `POST` | `/upload/profile-picture/:userId` | Upload and update user profile picture |
-| `POST` | `/upload/city-image/:cityId`    | Upload and update city image          |
+| `POST` | `/upload/city-image/:cityId`      | Upload and update city image           |
 
 ## 🔁 Token Flow
 
@@ -263,6 +274,7 @@ curl -X POST http://localhost:3000/upload/city-image/1 \
 
 **🚀 Live Production API:**
 Interactive Swagger documentation is available at `https://nestjs-pg-crud.onrender.com/api` where you can:
+
 - View all available endpoints
 - Test API calls directly from the browser
 - See request/response schemas
@@ -338,7 +350,7 @@ Open `frontend-test.html` in your browser for a basic HTML interface to test the
 
 ## 🗂️ Project Structure
 
-```
+````
 src/
 ├── auth/              # Authentication logic
 ├── users/             # User management
@@ -364,7 +376,7 @@ frontend-test.html     # Basic API testing interface
 └── main.ts
 logs/                  # Application logs
 frontend-test.html     # Basic API testing interface
-```
+````
 
 ## 🧪 Testing
 
@@ -492,6 +504,31 @@ npm run migration:show         # Show migration status
 - Use `npm run test:e2e` for integration testing
 - Check database connection for E2E tests
 - Ensure test database is separate from development
+
+## 🐳 Docker Support
+
+### Quick Start with Docker
+
+```bash
+# Start entire stack (app + database)
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop everything
+docker-compose down
+```
+
+### Production Docker Build
+
+```bash
+# Build image
+docker build -t nestjs-enterprise .
+
+# Run container
+docker run -p 3000:3000 --env-file .env nestjs-enterprise
+```
 
 ## 🤝 Contributing
 
