@@ -50,7 +50,7 @@ export class AuthService {
     if (!passwordMatch) throw new UnauthorizedException('Wrong password');
 
     const tokens = await this.generateTokens(user);
-    await this.updateRefreshToken(user.id, tokens.refresh_token); // Store hashed refresh token in the databaseS
+    await this.updateRefreshToken(user.id, tokens.refresh_token);
 
     return tokens;
   }
@@ -106,12 +106,19 @@ export class AuthService {
     return { message: 'If email exists, reset link has been sent' };
   }
 
-  async resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
+  async resetPassword(
+    token: string,
+    newPassword: string,
+  ): Promise<{ message: string }> {
     // Find user by reset token
     const users = await this.usersService.findAll();
-    const user = users.find(u => u.resetPasswordToken === token);
+    const user = users.find((u) => u.resetPasswordToken === token);
 
-    if (!user || !user.resetPasswordExpires || user.resetPasswordExpires < new Date()) {
+    if (
+      !user ||
+      !user.resetPasswordExpires ||
+      user.resetPasswordExpires < new Date()
+    ) {
       throw new BadRequestException('Invalid or expired reset token');
     }
 
@@ -126,5 +133,54 @@ export class AuthService {
     } as any);
 
     return { message: 'Password reset successfully' };
+  }
+
+  async sendEmailVerification(email: string): Promise<{ message: string }> {
+    const user = await this.usersService.findByEmail(email);
+    if (!user) {
+      return { message: 'If email exists, verification link has been sent' };
+    }
+
+    if (user.isEmailVerified) {
+      return { message: 'Email is already verified' };
+    }
+
+    // Generate verification token
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+    // Save token to database
+    await this.usersService.update(user.id, {
+      emailVerificationToken: verificationToken,
+      emailVerificationTokenExpires: tokenExpiry,
+    } as any);
+
+    // Send verification email
+    await this.emailService.sendEmailVerification(email, verificationToken);
+
+    return { message: 'Verification email sent' };
+  }
+
+  async verifyEmail(token: string): Promise<{ message: string }> {
+    // Find user by verification token
+    const users = await this.usersService.findAll();
+    const user = users.find((u) => u.emailVerificationToken === token);
+
+    if (
+      !user ||
+      !user.emailVerificationTokenExpires ||
+      user.emailVerificationTokenExpires < new Date()
+    ) {
+      throw new BadRequestException('Invalid or expired verification token');
+    }
+
+    // Mark email as verified and clear token
+    await this.usersService.update(user.id, {
+      isEmailVerified: true,
+      emailVerificationToken: null,
+      emailVerificationTokenExpires: null,
+    } as any);
+
+    return { message: 'Email verified successfully' };
   }
 }
