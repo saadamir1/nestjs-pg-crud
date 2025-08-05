@@ -34,6 +34,7 @@ A comprehensive, production-ready NestJS foundation with advanced authentication
 - 🎯 **Type Safety** - Full TypeScript support
 - 🧪 **Comprehensive Testing** - Unit tests, E2E tests, and test coverage
 - 📚 **API Documentation** - Interactive Swagger/OpenAPI documentation
+- 🔢 **API Versioning** - URI-based versioning (e.g., `/api/v1/users`)
 - 🛡️ **Rate Limiting** - Prevents API abuse with configurable limits
 - 🚀 **Live Deployment** - Production-ready app deployed on Render.com
 - 🖥️ **Frontend Test Page** - Basic HTML interface for API testing
@@ -112,13 +113,15 @@ npm run start:dev
 
 **Local Development:**
 
-- API: `http://localhost:3000`
-- Swagger: `http://localhost:3000/api`
+- API v1: `http://localhost:3000/api/v1`
+- Health Check: `http://localhost:3000`
+- Swagger: `http://localhost:3000/api/docs`
 
 **🚀 Live Production:**
 
-- API: `https://nestjs-pg-crud.onrender.com`
-- Swagger: `https://nestjs-pg-crud.onrender.com/api`
+- API v1: `https://nestjs-pg-crud.onrender.com/api/v1`
+- Health Check: `https://nestjs-pg-crud.onrender.com`
+- Swagger: `https://nestjs-pg-crud.onrender.com/api/docs`
 
 ## 🧪 API Endpoints
 
@@ -126,27 +129,27 @@ npm run start:dev
 
 | Method | Endpoint                | Description                |
 | ------ | ----------------------- | -------------------------- |
-| `POST` | `/auth/register`        | Register user (admin only) |
-| `POST` | `/auth/login`           | Login and get tokens       |
-| `POST` | `/auth/refresh`         | Refresh access token       |
-| `POST` | `/auth/forgot-password` | Request password reset     |
-| `POST` | `/auth/reset-password`  | Reset password with token  |
-| `POST` | `/auth/send-verification` | Send email verification  |
-| `POST` | `/auth/verify-email`    | Verify email with token    |
-| `POST` | `/auth/bootstrap-admin` | Create first admin user    |
-| `GET`  | `/auth/me`              | Get current user           |
+| `POST` | `/api/v1/auth/register`        | Register user (admin only) |
+| `POST` | `/api/v1/auth/login`           | Login and get tokens       |
+| `POST` | `/api/v1/auth/refresh`         | Refresh access token       |
+| `POST` | `/api/v1/auth/forgot-password` | Request password reset     |
+| `POST` | `/api/v1/auth/reset-password`  | Reset password with token  |
+| `POST` | `/api/v1/auth/send-verification` | Send email verification  |
+| `POST` | `/api/v1/auth/verify-email`    | Verify email with token    |
+| `POST` | `/api/v1/auth/bootstrap-admin` | Create first admin user    |
+| `GET`  | `/api/v1/auth/me`              | Get current user           |
 
 ### 👤 Users (Protected)
 
 | Method   | Endpoint              | Description                |
 | -------- | --------------------- | -------------------------- |
-| `GET`    | `/users`              | Get all users (admin only) |
-| `GET`    | `/users/profile`      | Get user profile           |
-| `GET`    | `/users/:id`          | Get user by ID             |
-| `PATCH`  | `/users/profile`      | Update user profile        |
-| `PATCH`  | `/users/change-password` | Change user password    |
-| `PATCH`  | `/users/:id`          | Update user (admin only)   |
-| `DELETE` | `/users/:id`          | Delete user (admin only)   |
+| `GET`    | `/api/v1/users`              | Get all users (admin only) |
+| `GET`    | `/api/v1/users/profile`      | Get user profile           |
+| `GET`    | `/api/v1/users/:id`          | Get user by ID             |
+| `PATCH`  | `/api/v1/users/profile`      | Update user profile        |
+| `PATCH`  | `/api/v1/users/change-password` | Change user password    |
+| `PATCH`  | `/api/v1/users/:id`          | Update user (admin only)   |
+| `DELETE` | `/api/v1/users/:id`          | Delete user (admin only)   |
 
 ### 🌍 Cities (Example Module)
 
@@ -154,20 +157,20 @@ npm run start:dev
 
 | Method   | Endpoint                  | Description          |
 | -------- | ------------------------- | -------------------- |
-| `POST`   | `/cities`                 | Create city          |
-| `GET`    | `/cities?page=1&limit=10` | Get paginated cities |
-| `GET`    | `/cities/:id`             | Get city by ID       |
-| `PATCH`  | `/cities/:id`             | Update city          |
-| `DELETE` | `/cities/:id`             | Soft delete city     |
+| `POST`   | `/api/v1/cities`                 | Create city          |
+| `GET`    | `/api/v1/cities?page=1&limit=10` | Get paginated cities |
+| `GET`    | `/api/v1/cities/:id`             | Get city by ID       |
+| `PATCH`  | `/api/v1/cities/:id`             | Update city          |
+| `DELETE` | `/api/v1/cities/:id`             | Soft delete city     |
 
 ### 📁 File Upload (Protected)
 
 | Method | Endpoint                          | Description                            |
 | ------ | --------------------------------- | -------------------------------------- |
-| `POST` | `/upload/image`                   | Upload general image file              |
-| `POST` | `/upload/avatar`                  | Upload user avatar image               |
-| `POST` | `/upload/profile-picture/:userId` | Upload and update user profile picture |
-| `POST` | `/upload/city-image/:cityId`      | Upload and update city image           |
+| `POST` | `/api/v1/upload/image`                   | Upload general image file              |
+| `POST` | `/api/v1/upload/avatar`                  | Upload user avatar image               |
+| `POST` | `/api/v1/upload/profile-picture/:userId` | Upload and update user profile picture |
+| `POST` | `/api/v1/upload/city-image/:cityId`      | Upload and update city image           |
 
 ## 🔁 Token Flow
 
@@ -223,7 +226,7 @@ npm run start:prod
 
 ```bash
 # Register (admin only - requires JWT token)
-curl -X POST http://localhost:3000/auth/register \
+curl -X POST http://localhost:3000/api/v1/auth/register \
   -H "Authorization: Bearer ADMIN_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"email": "user@example.com", "password": "securePassword123", "firstName": "John", "lastName": "Doe"}'
