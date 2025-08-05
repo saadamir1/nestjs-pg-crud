@@ -11,6 +11,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { UploadModule } from './upload/upload.module';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
+import { AuditLog } from './common/entities/audit-log.entity';
 
 @Module({
   imports: [
@@ -83,6 +84,7 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
         };
       },
     }),
+    TypeOrmModule.forFeature([AuditLog]),
     CitiesModule,
     UsersModule,
     AuthModule,
