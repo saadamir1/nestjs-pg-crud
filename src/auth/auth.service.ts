@@ -2,16 +2,20 @@ import {
   Injectable,
   UnauthorizedException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import { EmailService } from '../common/services/email.service';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private emailService: EmailService,
   ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
@@ -77,5 +81,50 @@ export class AuthService {
     } catch (err) {
       throw new ForbiddenException('Invalid or expired refresh token');
     }
+  }
+
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    const user = await this.usersService.findByEmail(email);
+    if (!user) {
+      // Don't reveal if email exists or not for security
+      return { message: 'If email exists, reset link has been sent' };
+    }
+
+    // Generate reset token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenExpiry = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
+    // Save token to database
+    await this.usersService.update(user.id, {
+      resetPasswordToken: resetToken,
+      resetPasswordExpires: resetTokenExpiry,
+    } as any);
+
+    // Send email
+    await this.emailService.sendPasswordResetEmail(email, resetToken);
+
+    return { message: 'If email exists, reset link has been sent' };
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
+    // Find user by reset token
+    const users = await this.usersService.findAll();
+    const user = users.find(u => u.resetPasswordToken === token);
+
+    if (!user || !user.resetPasswordExpires || user.resetPasswordExpires < new Date()) {
+      throw new BadRequestException('Invalid or expired reset token');
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update user password and clear reset token
+    await this.usersService.update(user.id, {
+      password: hashedPassword,
+      resetPasswordToken: null,
+      resetPasswordExpires: null,
+    } as any);
+
+    return { message: 'Password reset successfully' };
   }
 }
