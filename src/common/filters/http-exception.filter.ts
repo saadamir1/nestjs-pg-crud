@@ -33,13 +33,16 @@ export class AllExceptionsFilter implements ExceptionFilter {
     this.logException(exception, request, status);
 
     // Send a structured JSON response
-    response.status(status).json({
+    const errorResponse = {
       success: false,
       statusCode: status,
+      error: exception instanceof HttpException ? exception.name : 'Internal Server Error',
       message,
       path: request.url,
       timestamp: new Date().toISOString(),
-    });
+    };
+
+    response.status(status).json(errorResponse);
   }
 
   private logException(exception: unknown, request: Request, status: number) {
