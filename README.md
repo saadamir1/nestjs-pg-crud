@@ -20,6 +20,8 @@ A full-featured REST API built with NestJS, PostgreSQL, and TypeORM with JWT aut
 - 🔄 **Token Refresh Mechanism**
 - 🛡️ **Role-Based Access Control** (Admin/User)
 - 🔒 **Hashed Passwords with bcrypt**
+- 📧 **Password Reset via Email** (Secure token-based reset)
+- ✉️ **Email Service Integration** (Nodemailer with Gmail)
 - 📋 **Pagination Support** (e.g., `/cities?page=2`)
 - 🧹 **Soft Delete Support** (e.g., cities)
 - 📁 **File Upload** - Image upload with Cloudinary integration
@@ -75,6 +77,11 @@ CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
 
+# Email Configuration (for password reset)
+EMAIL_USER=your-gmail@gmail.com
+EMAIL_PASS=your-gmail-app-password
+FRONTEND_URL=http://localhost:3001
+
 # Production Database URL (optional)
 DATABASE_URL=postgresql://username:password@host:port/database
 ```
@@ -107,12 +114,14 @@ npm run start:dev
 
 ### 🔐 Auth
 
-| Method | Endpoint         | Description                |
-| ------ | ---------------- | -------------------------- |
-| `POST` | `/auth/register` | Register user (admin only) |
-| `POST` | `/auth/login`    | Login and get tokens       |
-| `POST` | `/auth/refresh`  | Refresh access token       |
-| `GET`  | `/auth/me`       | Get current user           |
+| Method | Endpoint              | Description                |
+| ------ | --------------------- | -------------------------- |
+| `POST` | `/auth/register`      | Register user (admin only) |
+| `POST` | `/auth/login`         | Login and get tokens       |
+| `POST` | `/auth/refresh`       | Refresh access token       |
+| `POST` | `/auth/forgot-password` | Request password reset   |
+| `POST` | `/auth/reset-password`  | Reset password with token|
+| `GET`  | `/auth/me`            | Get current user           |
 
 ### 👤 Users (Protected)
 
@@ -204,6 +213,16 @@ curl -X POST http://localhost:3000/auth/register \
 curl -X POST http://localhost:3000/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email": "user@example.com", "password": "securePassword123"}'
+
+# Forgot Password
+curl -X POST http://localhost:3000/auth/forgot-password \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com"}'
+
+# Reset Password
+curl -X POST http://localhost:3000/auth/reset-password \
+  -H "Content-Type: application/json" \
+  -d '{"token": "reset-token-from-email", "newPassword": "newSecurePassword123"}'
 ```
 
 ### Protected Routes
@@ -439,6 +458,14 @@ npm run migration:show         # Show migration status
 - Verify JWT secrets in `.env`
 - Use refresh endpoint when access token expires
 - Check `Authorization: Bearer <token>` format
+
+**Email Issues:**
+
+- Check Gmail app password is correct (16 characters)
+- Verify 2-Factor Authentication is enabled on Gmail
+- Check spam folder for reset emails
+- Ensure `EMAIL_USER` and `EMAIL_PASS` are set in `.env`
+- Verify `FRONTEND_URL` matches your frontend domain
 
 **Permission Denied:**
 
