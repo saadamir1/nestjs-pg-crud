@@ -28,4 +28,17 @@ export class EmailService {
 
     await this.transporter.sendMail(mailOptions);
   }
+
+  async sendEmailVerification(email: string, verificationToken: string): Promise<void> {
+    const verificationUrl = `${this.configService.get<string>('FRONTEND_URL')}/verify-email?token=${verificationToken}`;
+    
+    const mailOptions = {
+      from: this.configService.get<string>('EMAIL_USER'),
+      to: email,
+      subject: 'Verify Your Email Address',
+      text: `Welcome! Please verify your email address by clicking the link below:\n\n${verificationUrl}\n\nThis link will expire in 24 hours.\n\nIf you didn't create an account, please ignore this email.`,
+    };
+
+    await this.transporter.sendMail(mailOptions);
+  }
 }
