@@ -38,4 +38,10 @@ export class User {
 
   @Column({ type: 'text', nullable: true })
   profilePicture: string;
+
+  @Column({ type: 'text', nullable: true })
+  resetPasswordToken: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  resetPasswordExpires: Date;
 }
