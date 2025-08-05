@@ -27,6 +27,7 @@ A comprehensive, production-ready NestJS foundation with advanced authentication
 - 📁 **File Upload** - Image upload with Cloudinary integration
 - 🖼️ **Image Processing** - Automatic optimization and transformation
 - 🧾 **Request Logging** - Winston logger with file output
+- 📊 **Audit Logging** - User activity tracking for security and compliance
 - 🚀 **RESTful API Structure**
 - 📊 **Database Integration** - PostgreSQL with TypeORM
 - 🔄 **Database Migrations** - Version control for database schema
@@ -130,15 +131,22 @@ npm run start:dev
 | `POST` | `/auth/refresh`         | Refresh access token       |
 | `POST` | `/auth/forgot-password` | Request password reset     |
 | `POST` | `/auth/reset-password`  | Reset password with token  |
+| `POST` | `/auth/send-verification` | Send email verification  |
+| `POST` | `/auth/verify-email`    | Verify email with token    |
+| `POST` | `/auth/bootstrap-admin` | Create first admin user    |
 | `GET`  | `/auth/me`              | Get current user           |
 
 ### 👤 Users (Protected)
 
-| Method | Endpoint         | Description                |
-| ------ | ---------------- | -------------------------- |
-| `GET`  | `/users`         | Get all users (admin only) |
-| `GET`  | `/users/profile` | Get user profile           |
-| `POST` | `/users/`        | Create user (admin only)   |
+| Method   | Endpoint              | Description                |
+| -------- | --------------------- | -------------------------- |
+| `GET`    | `/users`              | Get all users (admin only) |
+| `GET`    | `/users/profile`      | Get user profile           |
+| `GET`    | `/users/:id`          | Get user by ID             |
+| `PATCH`  | `/users/profile`      | Update user profile        |
+| `PATCH`  | `/users/change-password` | Change user password    |
+| `PATCH`  | `/users/:id`          | Update user (admin only)   |
+| `DELETE` | `/users/:id`          | Delete user (admin only)   |
 
 ### 🌍 Cities (Example Module)
 
@@ -234,6 +242,21 @@ curl -X POST http://localhost:3000/auth/forgot-password \
 curl -X POST http://localhost:3000/auth/reset-password \
   -H "Content-Type: application/json" \
   -d '{"token": "reset-token-from-email", "newPassword": "newSecurePassword123"}'
+
+# Send Email Verification
+curl -X POST http://localhost:3000/auth/send-verification \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com"}'
+
+# Verify Email
+curl -X POST http://localhost:3000/auth/verify-email \
+  -H "Content-Type: application/json" \
+  -d '{"token": "verification-token-from-email"}'
+
+# Bootstrap Admin (First time setup)
+curl -X POST http://localhost:3000/auth/bootstrap-admin \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@example.com", "password": "admin123", "firstName": "Admin", "lastName": "User"}'
 ```
 
 ### Protected Routes
@@ -268,6 +291,18 @@ curl -X POST http://localhost:3000/upload/profile-picture/2 \
 curl -X POST http://localhost:3000/upload/city-image/1 \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -F "file=@/path/to/city.jpg"
+
+# Update user profile
+curl -X PATCH http://localhost:3000/users/profile \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"firstName": "Updated", "lastName": "Name"}'
+
+# Change password
+curl -X PATCH http://localhost:3000/users/change-password \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"currentPassword": "oldPassword", "newPassword": "newPassword123"}'
 ```
 
 ### API Documentation
