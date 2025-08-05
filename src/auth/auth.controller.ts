@@ -66,12 +66,26 @@ export class AuthController {
     if (userExists) {
       throw new UnauthorizedException('Email already in use');
     }
-    return this.usersService.create({
+    
+    const user = await this.usersService.create({
       firstName: body.firstName,
       lastName: body.lastName,
       email: body.email,
       password: body.password,
     });
+
+    // Send verification email
+    await this.authService.sendEmailVerification(body.email);
+
+    return { 
+      message: 'User registered successfully. Please check your email to verify your account.',
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName
+      }
+    };
   }
 
   @Post('login')
@@ -226,5 +240,36 @@ export class AuthController {
   })
   async resetPassword(@Body() body: { token: string; newPassword: string }) {
     return this.authService.resetPassword(body.token, body.newPassword);
+  }
+
+  @Post('send-verification')
+  @ApiOperation({ summary: 'Send email verification' })
+  @ApiResponse({ status: 201, description: 'Verification email sent' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        email: { type: 'string', example: 'user@example.com' },
+      },
+    },
+  })
+  async sendEmailVerification(@Body() body: { email: string }) {
+    return this.authService.sendEmailVerification(body.email);
+  }
+
+  @Post('verify-email')
+  @ApiOperation({ summary: 'Verify email with token' })
+  @ApiResponse({ status: 201, description: 'Email verified successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid or expired token' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        token: { type: 'string', example: 'verification-token-here' },
+      },
+    },
+  })
+  async verifyEmail(@Body() body: { token: string }) {
+    return this.authService.verifyEmail(body.token);
   }
 }
