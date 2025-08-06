@@ -465,13 +465,12 @@ src/
 test/
 ├── email-verification.e2e-spec.ts  # Email verification E2E tests
 ├── app.e2e-spec.ts                 # Health check E2E test
-├── cleanup-e2e-tests.md            # E2E test management guide
 └── jest-e2e.config.json            # E2E Jest configuration
 ```
 
 ### Test Management
 
-**Note**: Some E2E tests were removed due to rate limiting conflicts. The comprehensive unit test suite (60 tests) provides complete coverage of all business logic. See `test/cleanup-e2e-tests.md` for details on E2E test management.
+**Note**: Some E2E tests were removed due to rate limiting conflicts. The comprehensive unit test suite (60 tests) provides complete coverage of all business logic.
 
 ## 📜 Available Scripts
 
