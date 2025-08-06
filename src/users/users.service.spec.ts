@@ -3,7 +3,7 @@ import { UsersService } from './users.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
-import { UnauthorizedException } from '@nestjs/common';
+import { UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
@@ -18,7 +18,7 @@ describe('UsersService', () => {
   const mockUser = {
     id: 1,
     email: 'test@example.com',
-    password: 'hashedPassword',
+    password: '$2b$10$newHashedPassword',
     firstName: 'John',
     lastName: 'Doe',
     role: 'user',
@@ -36,8 +36,10 @@ describe('UsersService', () => {
     delete: jest.fn(),
   };
 
+  let module: TestingModule;
+
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+    module = await Test.createTestingModule({
       providers: [
         UsersService,
         { provide: getRepositoryToken(User), useValue: mockRepo },
@@ -50,6 +52,11 @@ describe('UsersService', () => {
     jest.clearAllMocks();
   });
 
+  afterEach(async () => {
+    await module.close();
+  });
+
+  // ========== ORIGINAL TESTS ==========
   describe('findAll', () => {
     it('should return all users', async () => {
       mockRepo.find.mockResolvedValue(mockUsers);
@@ -150,6 +157,75 @@ describe('UsersService', () => {
 
       expect(mockRepo.delete).toHaveBeenCalledWith(1);
       expect(result).toEqual(deleteResult);
+    });
+  });
+
+  // ========== NEW TESTS FOR PROFILE MANAGEMENT ==========
+
+  describe('updateProfile', () => {
+    it('should update user profile successfully', async () => {
+      const updateData = { firstName: 'Updated', lastName: 'Name' };
+      const updatedUser = { ...mockUser, ...updateData };
+
+      mockRepo.findOne.mockResolvedValue(mockUser);
+      mockRepo.save.mockResolvedValue(updatedUser);
+
+      const result = await service.updateProfile(1, updateData);
+
+      expect(result.firstName).toBe('Updated');
+      expect(result.lastName).toBe('Name');
+      expect(mockRepo.save).toHaveBeenCalled();
+    });
+
+    it('should throw error if user not found', async () => {
+      mockRepo.findOne.mockResolvedValue(null);
+
+      await expect(service.updateProfile(999, { firstName: 'Test' })).rejects.toThrow(
+        UnauthorizedException
+      );
+    });
+  });
+
+  describe('changePassword', () => {
+    it('should change password successfully', async () => {
+      const changePasswordDto = {
+        currentPassword: 'oldPassword',
+        newPassword: 'newPassword123',
+      };
+
+      mockRepo.findOne.mockResolvedValue(mockUser);
+      mockedBcrypt.compare.mockResolvedValue(true as never);
+      mockedBcrypt.hash.mockResolvedValue('$2b$10$newHashedPassword' as never);
+      mockRepo.save.mockResolvedValue({ ...mockUser, password: '$2b$10$newHashedPassword' });
+
+      const result = await service.changePassword(1, changePasswordDto);
+
+      expect(result.message).toBe('Password changed successfully');
+      expect(mockedBcrypt.compare).toHaveBeenCalledWith('oldPassword', mockUser.password);
+      expect(mockedBcrypt.hash).toHaveBeenCalledWith('newPassword123', 10);
+      expect(mockRepo.save).toHaveBeenCalled();
+    });
+
+    it('should throw error for incorrect current password', async () => {
+      const changePasswordDto = {
+        currentPassword: 'wrongPassword',
+        newPassword: 'newPassword123',
+      };
+
+      mockRepo.findOne.mockResolvedValue(mockUser);
+      mockedBcrypt.compare.mockResolvedValue(false as never);
+
+      await expect(service.changePassword(1, changePasswordDto)).rejects.toThrow(
+        new BadRequestException('Current password is incorrect')
+      );
+    });
+
+    it('should throw error if user not found', async () => {
+      mockRepo.findOne.mockResolvedValue(null);
+
+      await expect(
+        service.changePassword(999, { currentPassword: 'old', newPassword: 'new' })
+      ).rejects.toThrow(UnauthorizedException);
     });
   });
 });
