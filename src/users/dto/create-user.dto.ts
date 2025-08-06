@@ -53,4 +53,7 @@ export class CreateUserDto {
   @IsString()
   @IsOptional()
   profilePicture?: string;
+
+  @IsOptional()
+  isEmailVerified?: boolean;
 }
