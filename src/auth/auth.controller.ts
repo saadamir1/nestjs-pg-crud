@@ -197,10 +197,11 @@ export class AuthController {
       throw new UnauthorizedException('Admin user already exists');
     }
 
-    // Create admin user
+    // Create admin user with email already verified
     const adminUser = await this.usersService.create({
       ...body,
       role: 'admin',
+      isEmailVerified: true,
     });
 
     // Generate tokens for immediate use
