@@ -12,15 +12,19 @@ describe('AuthController', () => {
   const mockAuthService = {
     login: jest.fn(),
     refresh: jest.fn(),
+    sendEmailVerification: jest.fn(),
   };
 
   const mockUsersService = {
     findByEmail: jest.fn(),
+    findOne: jest.fn(),
     create: jest.fn(),
   };
 
+  let module: TestingModule;
+
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+    module = await Test.createTestingModule({
       controllers: [AuthController],
       providers: [
         { provide: AuthService, useValue: mockAuthService },
@@ -33,6 +37,10 @@ describe('AuthController', () => {
     usersService = module.get<UsersService>(UsersService);
     
     jest.clearAllMocks();
+  });
+
+  afterEach(async () => {
+    await module.close();
   });
 
   describe('login', () => {
@@ -81,12 +89,15 @@ describe('AuthController', () => {
       
       mockUsersService.findByEmail.mockResolvedValue(null);
       mockUsersService.create.mockResolvedValue(createdUser);
+      mockAuthService.sendEmailVerification.mockResolvedValue({ message: 'Verification email sent' });
 
       const result = await controller.register(registerDto);
 
       expect(usersService.findByEmail).toHaveBeenCalledWith(registerDto.email);
       expect(usersService.create).toHaveBeenCalledWith(registerDto);
-      expect(result).toEqual(createdUser);
+      expect(authService.sendEmailVerification).toHaveBeenCalledWith(registerDto.email);
+      expect(result).toHaveProperty('message');
+      expect(result).toHaveProperty('user');
     });
 
     it('should throw UnauthorizedException when email is already in use', async () => {
@@ -106,12 +117,16 @@ describe('AuthController', () => {
   });
 
   describe('getMe', () => {
-    it('should return current user', () => {
-      const user = { id: 1, email: 'test@example.com' };
+    it('should return current user', async () => {
+      const user = { userId: 1, email: 'test@example.com' };
+      const fullUser = { id: 1, email: 'test@example.com', firstName: 'John', lastName: 'Doe' };
       
-      const result = controller.getMe(user);
+      mockUsersService.findOne.mockResolvedValue(fullUser);
       
-      expect(result).toEqual(user);
+      const result = await controller.getMe(user);
+      
+      expect(usersService.findOne).toHaveBeenCalledWith(user.userId);
+      expect(result).toEqual(fullUser);
     });
   });
 });
