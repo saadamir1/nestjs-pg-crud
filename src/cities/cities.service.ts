@@ -11,8 +11,12 @@ export class CitiesService {
     @InjectRepository(City) private readonly citiesRepository: Repository<City>,
   ) {}
   async create(createCityDto: CreateCityDto) {
-    const city = this.citiesRepository.create(createCityDto);
-    return await this.citiesRepository.save(city);
+    try {
+      const city = this.citiesRepository.create(createCityDto);
+      return await this.citiesRepository.save(city);
+    } catch (err) {
+      throw err;
+    }
   }
 
   async findAll(page: number = 1, limit: number = 10) {
