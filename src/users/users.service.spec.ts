@@ -11,6 +11,9 @@ import * as bcrypt from 'bcrypt';
 jest.mock('bcrypt');
 const mockedBcrypt = bcrypt as jest.Mocked<typeof bcrypt>;
 
+const TEST_PASSWORD = 'testPassword123';
+const TEST_HASHED_PASSWORD = '$2b$10$testHashedPassword';
+
 describe('UsersService', () => {
   let service: UsersService;
   let repo: Repository<User>;
@@ -18,7 +21,7 @@ describe('UsersService', () => {
   const mockUser = {
     id: 1,
     email: 'test@example.com',
-    password: '$2b$10$newHashedPassword',
+    password: TEST_HASHED_PASSWORD,
     firstName: 'John',
     lastName: 'Doe',
     role: 'user',
@@ -102,7 +105,7 @@ describe('UsersService', () => {
     it('should create a new user with hashed password', async () => {
       const createUserDto: CreateUserDto = {
         email: 'new@example.com',
-        password: 'plainPassword',
+        password: TEST_PASSWORD,
         firstName: 'Jane',
         lastName: 'Smith',
         role: 'user',
@@ -114,7 +117,7 @@ describe('UsersService', () => {
 
       const result = await service.create(createUserDto);
 
-      expect(mockedBcrypt.hash).toHaveBeenCalledWith('plainPassword', 10);
+      expect(mockedBcrypt.hash).toHaveBeenCalledWith(TEST_PASSWORD, 10);
       expect(mockRepo.create).toHaveBeenCalledWith({
         ...createUserDto,
         password: 'hashedPassword',
@@ -189,8 +192,8 @@ describe('UsersService', () => {
   describe('changePassword', () => {
     it('should change password successfully', async () => {
       const changePasswordDto = {
-        currentPassword: 'oldPassword',
-        newPassword: 'newPassword123',
+        currentPassword: 'oldPassword123',
+        newPassword: TEST_PASSWORD,
       };
 
       mockRepo.findOne.mockResolvedValue(mockUser);
@@ -201,15 +204,15 @@ describe('UsersService', () => {
       const result = await service.changePassword(1, changePasswordDto);
 
       expect(result.message).toBe('Password changed successfully');
-      expect(mockedBcrypt.compare).toHaveBeenCalledWith('oldPassword', mockUser.password);
-      expect(mockedBcrypt.hash).toHaveBeenCalledWith('newPassword123', 10);
+      expect(mockedBcrypt.compare).toHaveBeenCalledWith('oldPassword123', mockUser.password);
+      expect(mockedBcrypt.hash).toHaveBeenCalledWith(TEST_PASSWORD, 10);
       expect(mockRepo.save).toHaveBeenCalled();
     });
 
     it('should throw error for incorrect current password', async () => {
       const changePasswordDto = {
-        currentPassword: 'wrongPassword',
-        newPassword: 'newPassword123',
+        currentPassword: 'wrongPassword123',
+        newPassword: TEST_PASSWORD,
       };
 
       mockRepo.findOne.mockResolvedValue(mockUser);
@@ -224,7 +227,7 @@ describe('UsersService', () => {
       mockRepo.findOne.mockResolvedValue(null);
 
       await expect(
-        service.changePassword(999, { currentPassword: 'old', newPassword: 'new' })
+        service.changePassword(999, { currentPassword: 'oldPassword123', newPassword: TEST_PASSWORD })
       ).rejects.toThrow(UnauthorizedException);
     });
   });
