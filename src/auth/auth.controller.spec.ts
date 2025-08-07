@@ -4,6 +4,8 @@ import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { UnauthorizedException, ForbiddenException } from '@nestjs/common';
 
+const TEST_PASSWORD = 'testPassword123';
+
 describe('AuthController', () => {
   let controller: AuthController;
   let authService: AuthService;
@@ -45,7 +47,7 @@ describe('AuthController', () => {
 
   describe('login', () => {
     it('should return tokens on successful login', async () => {
-      const loginDto = { email: 'test@example.com', password: 'password' };
+      const loginDto = { email: 'test@example.com', password: TEST_PASSWORD };
       const tokens = { access_token: 'token', refresh_token: 'refresh' };
       
       mockAuthService.login.mockResolvedValue(tokens);
@@ -83,7 +85,7 @@ describe('AuthController', () => {
         firstName: 'John',
         lastName: 'Doe',
         email: 'new@example.com',
-        password: 'password',
+        password: TEST_PASSWORD,
       };
       const createdUser = { id: 1, ...registerDto };
       
@@ -105,7 +107,7 @@ describe('AuthController', () => {
         firstName: 'John',
         lastName: 'Doe',
         email: 'existing@example.com',
-        password: 'password',
+        password: TEST_PASSWORD,
       };
       
       mockUsersService.findByEmail.mockResolvedValue({ id: 1, email: registerDto.email });
