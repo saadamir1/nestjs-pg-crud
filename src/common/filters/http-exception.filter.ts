@@ -8,6 +8,11 @@ import {
 import { Request, Response } from 'express';
 import { logger } from '../middleware/logger'; // Import your winston logger
 
+// Sanitize user input to prevent log injection
+function sanitizeForLog(input: string): string {
+  return input.replace(/[\r\n\t]/g, '_').substring(0, 1000);
+}
+
 // This filter catches all unhandled exceptions in the app
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -36,7 +41,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const errorResponse = {
       success: false,
       statusCode: status,
-      error: exception instanceof HttpException ? exception.name : 'Internal Server Error',
+      error:
+        exception instanceof HttpException
+          ? exception.name
+          : 'Internal Server Error',
       message,
       path: request.url,
       timestamp: new Date().toISOString(),
@@ -81,17 +89,17 @@ export class AllExceptionsFilter implements ExceptionFilter {
       }
     } else if (exception instanceof Error) {
       // For general errors, always log as error
-      logger.error(`Unhandled Error: ${method} ${url} - ${status}`, {
+      logger.error(`Unhandled Error: ${method} ${sanitizeForLog(url)} - ${status}`, {
         ...logContext,
-        error: exception.message,
+        error: sanitizeForLog(exception.message),
         stack: exception.stack,
         name: exception.name,
       });
     } else {
       // For unknown exception types
-      logger.error(`Unknown Exception: ${method} ${url} - ${status}`, {
+      logger.error(`Unknown Exception: ${method} ${sanitizeForLog(url)} - ${status}`, {
         ...logContext,
-        error: String(exception),
+        error: sanitizeForLog(String(exception)),
         type: typeof exception,
       });
     }
