@@ -8,6 +8,8 @@ import {
   Delete,
   UseGuards,
   Req,
+  Query,
+  NotFoundException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -26,8 +28,8 @@ export class UsersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  findAll(@Query('page') page = 1, @Query('limit') limit = 10) {
+    return this.usersService.findAll(+page, +limit);
   }
 
   @Patch(':id')
@@ -42,13 +44,22 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Req() req) {
-    return req.user;
+  async getProfile(@Req() req) {
+    const user = await this.usersService.findOne(req.user.userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const { password, refreshToken, ...userProfile } = user;
+    return userProfile;
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    const user = await this.usersService.findOne(+id);
+    if (!user) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+    return user;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -68,7 +79,11 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Password changed successfully' })
   @ApiResponse({ status: 400, description: 'Current password is incorrect' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  changePassword(@Req() req, @Body() changePasswordDto: ChangePasswordDto) {
-    return this.usersService.changePassword(req.user.userId, changePasswordDto);
+  async changePassword(@Req() req, @Body() changePasswordDto: ChangePasswordDto) {
+    try {
+      return await this.usersService.changePassword(req.user.userId, changePasswordDto);
+    } catch (error) {
+      throw error;
+    }
   }
 }

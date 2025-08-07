@@ -14,8 +14,17 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  findAll() {
-    return this.userRepository.find();
+  async findAll(page: number = 1, limit: number = 10) {
+    const [users, total] = await this.userRepository.findAndCount({
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+    return {
+      data: users,
+      total,
+      page,
+      lastPage: Math.ceil(total / limit),
+    };
   }
 
   async findOne(id: number): Promise<User | null> {
@@ -38,7 +47,11 @@ export class UsersService {
     return this.userRepository.save(user);
   }
 
-  remove(id: number) {
+  async remove(id: number) {
+    const user = await this.findOne(id);
+    if (!user) {
+      throw new UnauthorizedException(`User with id ${id} not found`);
+    }
     return this.userRepository.delete(id);
   }
 
