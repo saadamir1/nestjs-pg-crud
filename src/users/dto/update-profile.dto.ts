@@ -40,9 +40,9 @@ export class ChangePasswordDto {
 
   @ApiProperty({
     example: 'newPassword123',
-    description: 'New password (min 4 characters)',
+    description: 'New password (min 8 characters)',
   })
   @IsString()
-  @MinLength(4, { message: 'Password must be at least 4 characters long' })
+  @MinLength(8, { message: 'Password must be at least 8 characters long' })
   newPassword: string;
 }
