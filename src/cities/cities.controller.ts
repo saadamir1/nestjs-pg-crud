@@ -33,8 +33,12 @@ export class CitiesController {
   @ApiResponse({ status: 201, description: 'City created successfully' })
   @ApiResponse({ status: 400, description: 'Invalid input data' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  create(@Body() createCityDto: CreateCityDto) {
-    return this.citiesService.create(createCityDto);
+  async create(@Body() createCityDto: CreateCityDto) {
+    try {
+      return await this.citiesService.create(createCityDto);
+    } catch (error) {
+      throw error;
+    }
   }
 
   @Get()
