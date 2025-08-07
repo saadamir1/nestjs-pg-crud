@@ -66,7 +66,7 @@ export class AuthController {
     if (userExists) {
       throw new UnauthorizedException('Email already in use');
     }
-    
+
     const user = await this.usersService.create({
       firstName: body.firstName,
       lastName: body.lastName,
@@ -77,14 +77,15 @@ export class AuthController {
     // Send verification email
     await this.authService.sendEmailVerification(body.email);
 
-    return { 
-      message: 'User registered successfully. Please check your email to verify your account.',
+    return {
+      message:
+        'User registered successfully. Please check your email to verify your account.',
       user: {
         id: user.id,
         email: user.email,
         firstName: user.firstName,
-        lastName: user.lastName
-      }
+        lastName: user.lastName,
+      },
     };
   }
 
@@ -152,7 +153,7 @@ export class AuthController {
     if (!fullUser) {
       throw new UnauthorizedException('User not found');
     }
-    
+
     // Remove sensitive data
     const { password, refreshToken, ...userProfile } = fullUser;
     return userProfile;
@@ -206,7 +207,10 @@ export class AuthController {
 
     // Generate tokens for immediate use
     const tokens = await this.authService.generateTokens(adminUser);
-    await this.authService.updateRefreshToken(adminUser.id, tokens.refresh_token);
+    await this.authService.updateRefreshToken(
+      adminUser.id,
+      tokens.refresh_token,
+    );
 
     return tokens;
   }
