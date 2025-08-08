@@ -67,7 +67,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     if (exception instanceof HttpException) {
       // For HTTP exceptions, log with appropriate level
-      const logMessage = `HTTP Exception: ${method} ${url} - ${status}`;
+      const logMessage = `HTTP Exception: ${method} ${sanitizeForLog(url)} - ${status}`;
 
       if (status >= 500) {
         // Server errors - log as error with full details
