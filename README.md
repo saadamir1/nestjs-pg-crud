@@ -11,6 +11,7 @@ A comprehensive, production-ready NestJS foundation with advanced authentication
 - **bcrypt** - Password hashing
 - **Cloudinary** - Cloud-based image storage and optimization
 - **Winston** - Logging library
+- **Nodemailer** - Email service for password reset and verification
 - **Multer** - File upload handling
 - **TypeScript** - Type safety
 
@@ -395,7 +396,8 @@ src/
 ├── cities/            # Cities CRUD
 ├── upload/            # File upload functionality
 ├── common/            # Guards, decorators, middleware, services
-│   ├── services/      # Cloudinary service
+│   ├── services/      # Cloudinary, Email, Audit services
+│   ├── entities/      # Audit log entity
 │   └── middleware/    # Logger middleware
 ├── migrations/        # Database migrations
 ├── data-source.ts     # TypeORM CLI configuration
